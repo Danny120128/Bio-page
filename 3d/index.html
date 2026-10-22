@@ -6,35 +6,31 @@
 <title>立體眼球調焦模型</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500&family=Noto+Serif+TC:wght@600&display=swap">
 <style>
-/* layout: a dark 3D stage (fixed palette, like a lab viewing box) with overlay pill, view presets and labels; a themed control panel under it (slider, cut mode, layer chips, readouts, causal chain, structure info); then short reading sections. 上課模式 hides the reading text and enlarges the stage. */
+/* layout: a dark 3D stage (fixed palette, like a lab viewing box) with status pills, view presets, labels and two optics insets; a themed control panel under it (object distance, eye condition, spectacles, display options, readouts, causal chain, structure info). 上課模式 enlarges the stage. */
 :root{
   --paper:#F3F6F8;--card:#FFFFFF;--ink:#17202A;--muted:#5A6672;--line:#D5DDE4;
-  --muscle:#CF4F3A;--muscle-soft:#F6D3CB;--zonule:#B9800F;--lens-soft:#D6EAF9;--lens-edge:#2E74B0;--post:#1E8C7E;
-  --stage:#0C1520;--stage-ink:#E8EEF3;--stage-muted:#97A7B6;--stage-line:rgba(232,238,243,.16);--stage-chip:rgba(12,21,32,.72);
+  --muscle:#CF4F3A;--muscle-soft:#F6D3CB;--lens-soft:#D6EAF9;--lens-edge:#2E74B0;--post:#1E8C7E;--ok:#1E8C4E;--bad:#C0392B;
+  --stage:#0C1520;--stage-ink:#E8EEF3;--stage-muted:#97A7B6;--stage-line:rgba(232,238,243,.16);--stage-chip:rgba(12,21,32,.78);
   --display:"Noto Serif TC","Songti TC","PMingLiU",serif;--body:"Noto Sans TC","PingFang HK","PingFang TC","Microsoft JhengHei",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#0F141A;--card:#171E26;--ink:#E5EBF0;--muted:#9AA7B3;--line:#2A3540;
-  --muscle:#EC735D;--muscle-soft:#4A2620;--zonule:#E2AB3E;--lens-soft:#1F3A52;--lens-edge:#86BCEA;--post:#4CC7B6;color-scheme:dark}}
+  --muscle:#EC735D;--muscle-soft:#4A2620;--lens-soft:#1F3A52;--lens-edge:#86BCEA;--post:#4CC7B6;--ok:#5FD08A;--bad:#F07A6A;color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0F141A;--card:#171E26;--ink:#E5EBF0;--muted:#9AA7B3;--line:#2A3540;
-  --muscle:#EC735D;--muscle-soft:#4A2620;--zonule:#E2AB3E;--lens-soft:#1F3A52;--lens-edge:#86BCEA;--post:#4CC7B6;color-scheme:dark}
+  --muscle:#EC735D;--muscle-soft:#4A2620;--lens-soft:#1F3A52;--lens-edge:#86BCEA;--post:#4CC7B6;--ok:#5FD08A;--bad:#F07A6A;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;margin:0}
-.wrap{max-width:1180px;margin:0 auto;padding-block:22px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.crumbs{font-size:14px;margin-bottom:8px}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-block:18px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.crumbs{font-size:14px;margin-bottom:6px}
 .crumbs a{color:var(--lens-edge);text-decoration:none}
 .crumbs a:hover{text-decoration:underline}
-h1{font-family:var(--display);font-size:clamp(26px,4.6vw,38px);line-height:1.25;margin:0 0 6px;text-wrap:balance}
-h2{font-family:var(--display);font-size:22px;margin:0 0 10px;text-wrap:balance}
+h1{font-family:var(--display);font-size:clamp(24px,4vw,34px);line-height:1.25;margin:0 0 12px;text-wrap:balance}
 h3{font-size:17px;font-weight:500;margin:0 0 6px}
-p{margin:0 0 12px;max-width:64ch}
-b{font-weight:500}
-.lede{color:var(--muted);margin:0 0 18px;max-width:70ch}
-kbd{font-family:inherit;font-size:13px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 6px;background:var(--card)}
+p{margin:0 0 10px}
 
-.stage{position:relative;height:clamp(380px,60vw,660px);background:var(--stage);border-radius:16px 16px 0 0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.stage{position:relative;height:clamp(400px,60vw,680px);background:var(--stage);border-radius:16px 16px 0 0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
 .stage canvas{display:block;width:100%;height:100%;cursor:grab}
 .stage canvas:active{cursor:grabbing}
 #leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -43,33 +39,50 @@ kbd{font-family:inherit;font-size:13px;border:1px solid var(--line);border-botto
 .lbl:hover,.lbl.sel{border-color:#FFD45C;color:#FFE7A3}
 .lbl.off{opacity:0;pointer-events:none}
 .ov{position:absolute;z-index:2}
-.tl{top:12px;left:12px}
+.tl{top:12px;left:12px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .tr{top:12px;right:12px;font-size:12px;color:var(--stage-muted);background:var(--stage-chip);padding:4px 10px;border-radius:999px;border:1px solid var(--stage-line)}
 .bl{left:12px;right:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;font-size:15px;font-weight:500;color:#0C1520;background:#BFE0FA;transition:background .45s}
 .pill::before{content:"";width:9px;height:9px;border-radius:50%;background:#2E74B0;transition:background .45s}
 .pill.near{background:#F6C8BE}
 .pill.near::before{background:#C6463A}
+.pill.ok{background:#C9F0D6}.pill.ok::before{background:#1E8C4E}
+.pill.bad{background:#FFD9C2}.pill.bad::before{background:#D9541E}
 .vbtn{font:inherit;font-size:13px;color:var(--stage-ink);background:var(--stage-chip);border:1px solid var(--stage-line);border-radius:8px;padding:5px 11px;cursor:pointer}
 .vbtn:hover{border-color:rgba(232,238,243,.45)}
 .vbtn[aria-pressed="true"]{background:#E8EEF3;color:#0C1520;border-color:#E8EEF3}
 .vbtn:focus-visible,.lbl:focus-visible{outline:2px solid #FFD45C;outline-offset:2px}
-@media (max-width:600px){.tr{display:none}.bl{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.bl::-webkit-scrollbar{display:none}.vbtn{flex:none}.stage{height:440px}}
+.insets{position:absolute;z-index:2;top:46px;right:12px;display:flex;flex-direction:column;gap:8px;width:250px;pointer-events:none}
+.inset{background:var(--stage-chip);border:1px solid var(--stage-line);border-radius:10px;padding:8px 10px;color:var(--stage-ink)}
+.inset .it{font-size:12px;color:var(--stage-muted);margin:0 0 4px}
+.inset svg{display:block;width:100%;height:auto;border-radius:6px;background:#06101A}
+.inset .iv{font-size:13px;margin:5px 0 0;font-variant-numeric:tabular-nums}
+.see{background:#FBFBF7;border-radius:6px;height:104px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.chart{color:#111;font-family:Georgia,"Times New Roman",serif;text-align:center;line-height:1.15;letter-spacing:.12em}
+.chart div{white-space:nowrap}
+@media (max-width:600px){.tr{display:none}.bl{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.bl::-webkit-scrollbar{display:none}.vbtn{flex:none}.stage{height:460px}
+  .insets{top:auto;bottom:52px;width:150px}.inset{padding:6px}.see{height:66px}.chart{transform:scale(.62)}.inset .iv{font-size:11.5px}}
 #nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--stage-ink);background:var(--stage)}
 
-.panel{background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 16px 16px;padding:16px 18px 18px}
+.panel{background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 16px 16px;padding:14px 18px 18px}
 .ctrl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .ctrl input[type=range]{flex:1;min-width:170px;accent-color:var(--muscle)}
 .ctrl .end{font-size:14px;color:var(--muted)}
+.ctrl+.ctrl{margin-top:10px}
 .btns{display:flex;gap:8px;flex-wrap:wrap}
 button{font:inherit}
 .btn{font-size:14px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 14px;cursor:pointer}
 .btn:hover{border-color:var(--muted)}
 .btn.main{background:var(--ink);color:var(--card);border-color:var(--ink)}
 .btn:focus-visible,input:focus-visible,.chip:focus-visible,.seg button:focus-visible{outline:2px solid var(--lens-edge);outline-offset:2px}
-.opts{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:14px}
-.olab{font-size:12px;color:var(--muted);letter-spacing:.04em;margin-right:2px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin-top:14px}
+.grp{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.grp .gt{font-size:12px;color:var(--muted);letter-spacing:.06em;margin:0}
+.row{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap}
+.row input[type=range]{flex:1;min-width:120px;accent-color:var(--lens-edge)}
+.val{font-size:14px;font-variant-numeric:tabular-nums;min-width:8.5em}
+.olab{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
 .seg button{font-size:13px;background:transparent;color:var(--ink);border:0;padding:5px 11px;cursor:pointer}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--card)}
@@ -80,11 +93,11 @@ button{font:inherit}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin-top:12px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
-.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;margin-top:14px}
 .r{border-top:1px solid var(--line);padding-top:7px;min-width:0}
-.r p{margin:0}.r .k{font-size:12px;color:var(--muted);letter-spacing:.04em}.r .v{font-size:17px;font-weight:500;font-variant-numeric:tabular-nums}
-.note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
-.lower{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:18px}
+.r p{margin:0}.r .k{font-size:12px;color:var(--muted);letter-spacing:.04em}.r .v{font-size:16.5px;font-weight:500;font-variant-numeric:tabular-nums}
+.r.wide{grid-column:span 2}.r .v.ok{color:var(--ok)}.r .v.bad{color:var(--bad)}
+.lower{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:16px}
 @media (max-width:760px){.lower{grid-template-columns:minmax(0,1fr)}}
 .chain{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-self:start;margin:0;padding:0;list-style:none;counter-reset:c}
 @media (max-width:480px){.chain{grid-template-columns:minmax(0,1fr)}}
@@ -100,52 +113,42 @@ button{font:inherit}
 .info .now{color:var(--ink);border-left:3px solid var(--muscle);padding-left:10px;border-radius:0}
 .info .tag{display:inline-block;font-size:12px;color:var(--post);border:1px solid var(--post);border-radius:999px;padding:0 8px;margin-bottom:6px}
 
-section{margin-top:40px}
-.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px}
-.two>div{min-width:0}
-.tips{margin:0;padding-left:20px}.tips li{margin-bottom:8px;max-width:62ch}
-.sums{display:grid;gap:10px;margin-top:6px}
-.sum{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:16px}
-.sum span{padding:4px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card)}
-.sum i{font-style:normal;color:var(--muted)}
-.sum.near span{border-color:var(--muscle)}
-.sum.far span{border-color:var(--lens-edge)}
-.sum b{min-width:3.2em;color:var(--muted);font-size:14px}
-.adv-box{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--card)}
-.adv-box .tag{display:inline-block;font-size:12px;color:var(--post);border:1px solid var(--post);border-radius:999px;padding:0 8px;margin-bottom:8px}
-.src{font-size:13.5px;color:var(--muted)}
-.src a{color:var(--lens-edge)}
-
-.present .crumbs,.present .lede,.present section{display:none}
-.present .wrap{max-width:1600px;padding-block:12px 20px}
-.present h1{font-size:clamp(24px,2.6vw,36px)}
-.present .stage{height:70vh}
+.present .crumbs{display:none}
+.present .wrap{max-width:1700px;padding-block:10px 20px}
+.present h1{font-size:clamp(22px,2.4vw,32px);margin-bottom:8px}
+.present .stage{height:72vh}
 .present .lbl{font-size:16px;padding:4px 10px}
-.present .pill{font-size:19px;padding:7px 18px}
+.present .pill{font-size:18px;padding:6px 16px}
 .present .vbtn{font-size:15px;padding:7px 13px}
-.present .chain li{font-size:18px}
-.present .r .v{font-size:20px}
+.present .insets{width:300px}
+.present .inset .iv{font-size:15px}
+.present .chain li{font-size:17px}
+.present .r .v{font-size:19px}
 @media (prefers-reduced-motion:reduce){.chain li,.pill,.pill::before,.lbl{transition:none}}
 </style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="crumbs"><a href="https://danny120128.github.io/Bio-page/">← 平面版：睫狀肌收縮，懸韌帶為什麼反而變鬆？</a></nav>
-<h1>立體眼球：睫狀肌怎樣讓晶狀體變凸</h1>
-<p class="lede">這是一個切開了的三維眼球。拖動畫面可以轉動，雙指可以縮放和移動；拖動滑桿或者按「自動演示」（也可以按 <kbd>空格</kbd>），看睫狀肌收縮時，睫狀體、懸韌帶和晶狀體怎樣一起變化。點模型裏任何結構或標註，下面會顯示說明。</p>
+<nav class="crumbs"><a href="https://danny120128.github.io/Bio-page/">← 平面版</a></nav>
+<h1>立體眼球調焦模型</h1>
 
 <div class="stage" id="stage">
   <canvas id="gl" aria-label="可以轉動的三維眼球模型"></canvas>
   <svg id="leaders" aria-hidden="true"></svg>
   <div id="labels"></div>
-  <div class="ov tl"><span class="pill" id="pill">看遠：睫狀肌放鬆</span></div>
+  <div class="ov tl"><span class="pill" id="pill">看遠：睫狀肌放鬆</span><span class="pill ok" id="pill2">影像清楚</span></div>
   <div class="ov tr" id="hint">拖動旋轉 · 雙指縮放和移動</div>
+  <div class="insets" id="insets">
+    <div class="inset" id="inFocus"><p class="it">視網膜附近（放大）</p><svg id="fsvg" viewBox="0 0 240 150" role="img" aria-label="焦點和視網膜的放大圖"></svg><p class="iv" id="fval">焦點：在視網膜上</p></div>
+    <div class="inset" id="inSee"><p class="it">眼睛看到的影像</p><div class="see"><div class="chart" id="chart"><div style="font-size:34px">E</div><div style="font-size:22px">F P</div><div style="font-size:15px">T O Z</div><div style="font-size:11px">L P E D</div></div></div><p class="iv" id="sval">清楚</p></div>
+  </div>
   <div class="ov bl" role="group" aria-label="視角">
     <button class="vbtn" type="button" data-view="oblique" aria-pressed="true">立體剖面</button>
-    <button class="vbtn" type="button" data-view="side" aria-pressed="false">正中切面</button>
+    <button class="vbtn" type="button" data-view="side" aria-pressed="false">正中切面（光路）</button>
     <button class="vbtn" type="button" data-view="front" aria-pressed="false">從前面看一整圈</button>
     <button class="vbtn" type="button" data-view="zoom" aria-pressed="false">放大睫狀體和懸韌帶</button>
+    <button class="vbtn" type="button" data-view="retina" aria-pressed="false">放大視網膜</button>
   </div>
   <div id="nogl" hidden>這部裝置的瀏覽器沒有開啟三維顯示（WebGL），所以模型無法顯示。請換用最新版的 Safari 或 Chrome 打開。</div>
 </div>
@@ -153,107 +156,87 @@ section{margin-top:40px}
 <div class="panel">
   <div class="ctrl">
     <span class="end">看遠</span>
-    <input type="range" id="s" min="0" max="1000" step="1" value="0" aria-label="從看遠到看近">
+    <input type="range" id="s" min="0" max="1000" step="1" value="0" aria-label="物體距離：從看遠到看近">
     <span class="end">看近</span>
     <div class="btns">
       <button id="play" class="btn main" type="button">自動演示</button>
       <button id="present" class="btn" type="button">上課模式</button>
     </div>
   </div>
+  <div class="ctrl" id="crow" hidden>
+    <span class="end">睫狀肌放鬆</span>
+    <input type="range" id="tm" min="0" max="1000" step="1" value="0" aria-label="手動控制睫狀肌">
+    <span class="end">睫狀肌收縮</span>
+  </div>
 
-  <div class="opts">
-    <div><span class="olab">剖開</span>
-      <span class="seg" role="group" aria-label="剖開方式">
-        <button type="button" data-cut="quarter" aria-pressed="true">切掉四分之一</button><button type="button" data-cut="half" aria-pressed="false">切掉一半</button><button type="button" data-cut="full" aria-pressed="false">不切開</button>
-      </span>
+  <div class="groups">
+    <div class="grp">
+      <p class="gt">眼睛</p>
+      <div class="row"><span class="seg" role="group" aria-label="眼睛類型"><button type="button" data-eye="normal" aria-pressed="true">正常</button><button type="button" data-eye="myopia" aria-pressed="false">近視</button><button type="button" data-eye="hyper" aria-pressed="false">遠視</button></span></div>
+      <div class="row" id="causeRow" hidden><span class="olab">成因</span><span class="seg" role="group" aria-label="成因"><button type="button" data-cause="axial" aria-pressed="true" id="cAx">眼球太長</button><button type="button" data-cause="lens" aria-pressed="false" id="cLe">晶狀體太凸</button></span></div>
+      <div class="row" id="sevRow" hidden><span class="olab">度數</span><input type="range" id="sev" min="50" max="800" step="25" value="300" aria-label="度數"><span class="val" id="sevv">300 度</span></div>
     </div>
-    <div class="chips" role="group" aria-label="顯示">
-      <button class="chip" type="button" data-opt="lab" aria-pressed="true">標註</button>
-      <button class="chip" type="button" data-opt="ray" aria-pressed="true">光線</button>
-      <button class="chip" type="button" data-opt="ghost" aria-pressed="true">看遠時的輪廓</button>
-      <button class="chip" type="button" data-opt="front" aria-pressed="true">角膜和虹膜</button>
-      <button class="chip" type="button" data-opt="sclera" aria-pressed="true">鞏膜</button>
-      <button class="chip adv" type="button" data-opt="adv" aria-pressed="true">後部懸韌帶</button>
+    <div class="grp">
+      <p class="gt">矯正眼鏡</p>
+      <div class="row"><span class="seg" role="group" aria-label="眼鏡"><button type="button" data-gl="none" aria-pressed="true">不戴</button><button type="button" data-gl="concave" aria-pressed="false">凹透鏡</button><button type="button" data-gl="convex" aria-pressed="false">凸透鏡</button></span>
+        <button class="btn" id="fit" type="button">配上合適眼鏡</button></div>
+      <div class="row" id="gpRow" hidden><span class="olab">鏡片</span><input type="range" id="gp" min="0" max="800" step="25" value="300" aria-label="鏡片度數"><span class="val" id="gpv">−3.00 D</span></div>
+    </div>
+    <div class="grp">
+      <p class="gt">顯示</p>
+      <div class="row"><span class="olab">剖開</span><span class="seg" role="group" aria-label="剖開方式"><button type="button" data-cut="quarter" aria-pressed="true">切掉四分之一</button><button type="button" data-cut="half" aria-pressed="false">切掉一半</button><button type="button" data-cut="full" aria-pressed="false">不切開</button></span></div>
+      <div class="chips" role="group" aria-label="顯示">
+        <button class="chip" type="button" data-opt="auto" aria-pressed="true">眼睛自動調焦</button>
+        <button class="chip" type="button" data-opt="ray" aria-pressed="true">光線</button>
+        <button class="chip" type="button" data-opt="fin" aria-pressed="true">焦點放大</button>
+        <button class="chip" type="button" data-opt="sin" aria-pressed="true">看到的影像</button>
+        <button class="chip" type="button" data-opt="lab" aria-pressed="true">標註</button>
+        <button class="chip" type="button" data-opt="ghost" aria-pressed="true">看遠時的輪廓</button>
+        <button class="chip" type="button" data-opt="front" aria-pressed="true">角膜和虹膜</button>
+        <button class="chip" type="button" data-opt="sclera" aria-pressed="true">鞏膜</button>
+        <button class="chip adv" type="button" data-opt="adv" aria-pressed="true">後部懸韌帶</button>
+      </div>
     </div>
   </div>
 
   <div class="legend">
     <span><i class="sw" style="background:#C6463A"></i>睫狀體（睫狀肌）</span>
-    <span><i class="sw" style="background:#F2A93B"></i>懸韌帶（連晶狀體，越亮越緊）</span>
+    <span><i class="sw" style="background:#F2A93B"></i>懸韌帶（越亮越緊）</span>
+    <span id="lg-adv"><i class="sw" style="background:#55D16E"></i>後部懸韌帶（越亮越緊）</span>
     <span><i class="sw" style="background:#9CD2FF"></i>晶狀體</span>
     <span><i class="sw" style="background:#5B2421"></i>脈絡膜</span>
     <span><i class="sw" style="background:#C97C66"></i>視網膜</span>
     <span><i class="sw" style="background:#FFD45C"></i>光線</span>
-    <span id="lg-adv"><i class="sw" style="background:#55D16E"></i>後部懸韌帶（越亮越緊）</span>
   </div>
 
   <div class="read">
+    <div class="r"><p class="k">物體距離</p><p class="v" id="o6">無限遠</p></div>
     <div class="r"><p class="k">睫狀肌</p><p class="v" id="o1">放鬆</p></div>
-    <div class="r"><p class="k">懸韌帶（連晶狀體）</p><p class="v" id="o2">拉緊</p></div>
-    <div class="r"><p class="k">後部懸韌帶</p><p class="v" id="o7">放鬆</p></div>
+    <div class="r"><p class="k">懸韌帶</p><p class="v" id="o2">拉緊</p></div>
+    <div class="r" id="r7"><p class="k">後部懸韌帶</p><p class="v" id="o7">放鬆</p></div>
     <div class="r"><p class="k">晶狀體</p><p class="v" id="o3">扁、薄</p></div>
     <div class="r"><p class="k">瞳孔</p><p class="v" id="o4">較大</p></div>
-    <div class="r"><p class="k">調節力</p><p class="v" id="o5">0.0 D</p></div>
-    <div class="r"><p class="k">看得清的距離</p><p class="v" id="o6">遠處</p></div>
+    <div class="r"><p class="k">調節</p><p class="v" id="o5">0.0 D</p></div>
+    <div class="r wide"><p class="k">焦點位置</p><p class="v ok" id="o8">在視網膜上</p></div>
+    <div class="r"><p class="k">影像</p><p class="v ok" id="o9">清楚</p></div>
   </div>
-  <p class="note">調節力按年輕人最大約 10 屈光度（D）估算，青少年通常更大一些。為了看得清楚，模型裏的形狀變化放大了大約兩到三倍。</p>
 
   <div class="lower">
     <ol class="chain" id="chain">
       <li data-a="睫狀肌舒張，不再出力" data-b="睫狀肌收縮，睫狀體向前、向內移"></li>
       <li data-a="脈絡膜的彈性把睫狀體拉回後外方，環變大" data-b="睫狀體圍成的環變小，離晶狀體更近"></li>
-      <li data-a="懸韌帶兩端離遠，被拉緊；後部懸韌帶放鬆" data-b="懸韌帶兩端靠近，變彎、變鬆；後部懸韌帶被拉緊"></li>
-      <li data-a="晶狀體被拉扁，折光能力變弱，看清遠處" data-b="晶狀體靠自身彈性變凸，折光能力變強，看清近處"></li>
+      <li data-a="懸韌帶兩端離遠，被拉緊" data-b="懸韌帶兩端靠近，變彎、變鬆"></li>
+      <li data-a="晶狀體被拉扁，折光能力變弱" data-b="晶狀體靠自身彈性變凸，折光能力變強"></li>
     </ol>
     <aside class="info" id="info" aria-live="polite">
       <p class="k">結構說明</p>
       <span class="tag" id="itag" hidden>課本沒有提及</span>
       <h3 id="iname">點一下模型裏的結構</h3>
-      <p id="itext">也可以點畫面裏的標註。選中的結構會在模型裏變亮。</p>
+      <p id="itext">也可以點畫面裏的標註。</p>
       <p class="now" id="inow" hidden></p>
     </aside>
   </div>
 </div>
-
-<section class="two">
-  <div>
-    <h2>建議這樣看</h2>
-    <ol class="tips">
-      <li>按 <b>從前面看一整圈</b>，再按自動演示。睫狀體是套在晶狀體外面的一個環，收縮時整圈往裏收，虛線是看遠時環和晶狀體的位置。</li>
-      <li>按 <b>放大睫狀體和懸韌帶</b>，盯著懸韌帶看：看遠時連晶狀體的懸韌帶是直的、亮的，後部的綠色纖維較暗；看近時正好反過來。</li>
-      <li>按 <b>正中切面</b>，打開光線。看遠和看近時，光線都要聚到視網膜上，看近時晶狀體必須更凸。</li>
-      <li>點一下脈絡膜和後部懸韌帶（綠色）。睫狀肌收縮時它們被往前拉緊；睫狀肌放鬆以後，脈絡膜的彈性把睫狀體拉回去，連晶狀體的懸韌帶才重新被拉緊。</li>
-    </ol>
-  </div>
-  <div>
-    <h2>課本要記住的</h2>
-    <div class="sums">
-      <div class="sum near"><b>看近</b><span>睫狀肌收縮</span><i>→</i><span>懸韌帶放鬆</span><i>→</i><span>晶狀體變凸</span><i>→</i><span>折光能力變強</span></div>
-      <div class="sum far"><b>看遠</b><span>睫狀肌舒張</span><i>→</i><span>懸韌帶拉緊</span><i>→</i><span>晶狀體變扁</span><i>→</i><span>折光能力變弱</span></div>
-    </div>
-    <p style="margin-top:14px">看近時瞳孔還會同時縮小，這和調節一起，屬於近反射。</p>
-  </div>
-</section>
-
-<section class="two">
-  <div class="adv-box">
-    <span class="tag">延伸內容</span>
-    <h2>綠色的後部懸韌帶是什麼？</h2>
-    <p>課本裏的懸韌帶，指的是連接睫狀體和晶狀體的那些纖維。其實懸韌帶系統還有往後延伸的部分：一組從睫狀突後方沿著睫狀體平坦部，一直連到視網膜前緣（鋸齒緣）附近；另一組連到包住玻璃體的玻璃體前界膜。Lütjen-Drecoll 等人在 2010 年用電子顯微鏡，在人的眼睛和猴子的眼睛裏都觀察到這些結構。</p>
-    <p>睫狀肌收縮時，睫狀體向前、向內移，這些後部纖維被往前拉緊，連到晶狀體的懸韌帶則變鬆；睫狀肌放鬆時反過來。老師看過的那段立體動畫（Goldberg，2011）就是根據這些解剖和超聲波研究畫成的，稱為前後懸韌帶此消彼長。後部纖維具體怎樣分擔力量，學界仍在研究。</p>
-    <p>中學階段只需要掌握上面的課本結論。不想顯示時，可以關掉「後部懸韌帶」。</p>
-    <p class="src">來源：Lütjen-Drecoll E 等. Morphology and accommodative function of the vitreous zonule in human and monkey eyes. <i>Investigative Ophthalmology &amp; Visual Science</i>, 2010. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2829378">查看論文</a><br>Goldberg DB. Computer-animated model of accommodation and theory of reciprocal zonular action. <i>Clinical Ophthalmology</i>, 2011. <a href="https://doaj.org/article/f3c4682f96924196aca95e25aba7d5c6">查看論文</a></p>
-  </div>
-  <div>
-    <h2>這個模型做了哪些簡化</h2>
-    <ol class="tips">
-      <li>大小按真實眼球大致比例（眼軸約 25 毫米），但晶狀體厚度、睫狀體移動和懸韌帶彎曲都放大了，真實的變化只有零點幾毫米。</li>
-      <li>睫狀體內側畫了 72 條睫狀突，真實的眼睛大約有 70 到 80 條。</li>
-      <li>光線只畫成在角膜和晶狀體各轉折一次，實際上光在每個界面都會折射，角膜負責大部分折光。</li>
-      <li>懸韌帶實際是成千上萬條細纖維，這裏每兩條睫狀突之間只畫五條連晶狀體的纖維作代表，後部懸韌帶也只畫了一部分。</li>
-    </ol>
-  </div>
-</section>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -358,27 +341,35 @@ const MAT={
   cil:mStd(0xC6463A,{roughness:.5}),cilCap:mStd(0xDA624F,{roughness:.6}),
   lens:mStd(0x9CD2FF,{transparent:true,opacity:.46,roughness:.12,depthWrite:false}),
   lensCap:mStd(0xA6D4F5,{transparent:true,opacity:.55,roughness:.2,depthWrite:false}),
+  glass:mStd(0xD6F0FF,{transparent:true,opacity:.14,roughness:.05,depthWrite:false}),
+  glassCap:mStd(0xDDF3FF,{transparent:true,opacity:.58,roughness:.1,depthWrite:false}),
+  glLine:new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.9}),
   zon:mStd(0xffffff,{vertexColors:true,roughness:.45}),
   post:mStd(0xffffff,{vertexColors:true,roughness:.45}),
-  ray:new THREE.MeshBasicMaterial({color:0xFFD45C,vertexColors:false}),
+  ray:new THREE.MeshBasicMaterial({color:0xFFD45C}),
+  dash:new THREE.MeshBasicMaterial({color:0xFFD45C,transparent:true,opacity:.55,depthWrite:false}),
+  focus:new THREE.MeshBasicMaterial({color:0x5FD08A}),
   hyal:mStd(0x8FE0D0,{transparent:true,opacity:.2,depthWrite:false,roughness:.3}),
   arrow:new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false}),
   arrowC:new THREE.MeshBasicMaterial({color:0xFFE7A3,transparent:true,opacity:0,depthWrite:false}),
-  obj:new THREE.MeshBasicMaterial({color:0xFFD45C,transparent:true,opacity:0}),
   ghost:new THREE.LineDashedMaterial({color:0xffffff,dashSize:.28,gapSize:.2,transparent:true,opacity:0,depthTest:false}),
   hyLine:new THREE.LineBasicMaterial({color:0x8FE0D0,transparent:true,opacity:.8})
 };
 const HL={cornea:[MAT.cornea],iris:[MAT.iris,MAT.irisCap],lens:[MAT.lens,MAT.lensCap],ciliary:[MAT.cil,MAT.cilCap],zonule:[MAT.zon],sclera:[MAT.sclera,MAT.scleraCap],
-  choroid:[MAT.choroid,MAT.choroidCap],retina:[MAT.retina,MAT.retinaCap],ppz:[MAT.post],hyaloid:[MAT.hyal],ray:[]};
+  choroid:[MAT.choroid,MAT.choroidCap],retina:[MAT.retina,MAT.retinaCap],ppz:[MAT.post],hyaloid:[MAT.hyal],glasses:[MAT.glass,MAT.glassCap],ray:[],focus:[]};
 
 /* ---------- state ---------- */
-const st={t:0,cut:'quarter',lab:true,ray:true,ghost:true,front:true,sclera:true,adv:true,sel:null};
+const st={t:0,tm:0,obj:0,auto:true,eye:'normal',cause:'axial',sev:3,gl:'none',gp:3,
+  cut:'quarter',lab:true,ray:true,ghost:true,front:true,sclera:true,adv:true,fin:true,sin:true,sel:null};
+/* eye defect parameters, solved from the chosen prescription: sax stretches the posterior globe (axial), c0 offsets lens convexity (refractive) */
+const OPT={sax:1,c0:0};
+const axy=y=>y<0?y*OPT.sax:y;
 const CUT=()=>st.cut==='full'?[0,TAU]:st.cut==='half'?[UP,Math.PI]:[UP,Math.PI*1.5];
 const NPROC=72,bump=f=>0.32*(0.5+0.5*Math.cos(NPROC*f));
 
 function geom(t){
-  const g={t};
-  g.a=lerp(4.7,4.2,t);g.bA=lerp(1.5,2.2,t);g.bP=lerp(2.1,2.3,t);g.yc=lerp(8.0,7.97,t);
+  const g={t},tl=t+OPT.c0;
+  g.a=lerp(4.7,4.2,tl);g.bA=lerp(1.5,2.2,tl);g.bP=lerp(2.1,2.3,tl);g.yc=lerp(8.0,7.97,tl);
   g.p=lerp(2.4,1.5,t);g.yo=lerp(5.6,6.0,t);
   const c=(r0,y0,r1,y1)=>[lerp(r0,r1,t),lerp(y0,y1,t)];
   g.O=onR(11.5,g.yo);g.Oin=onR(11.1,g.yo+0.3);g.PP2=onR(10.95,g.yo+1.3);
@@ -390,15 +381,16 @@ const lensPt=(g,th)=>[g.a*Math.sin(th),g.yc+(Math.cos(th)>=0?g.bA:g.bP)*Math.cos
 const lensY=(g,r)=>g.yc+g.bA*Math.sqrt(Math.max(0,1-(r/g.a)*(r/g.a)));
 const IRB=[6.15,9.3],IRF=[6.22,9.62];
 function irisBackY(g,r){const yb=lensY(g,g.p)+0.08;return lerp(yb,IRB[1],(r-g.p)/(IRB[0]-g.p));}
+const axs=segs=>segs.map(s=>s.map(p=>[p[0],axy(p[1]),p[2]]));
 
 function scleraSegs(){const aL=Math.acos(10.515/12),aJ=Math.acos(10.12/11.5);
-  return [arcA(0,12,aL,Math.PI,44),arcA(0,11.5,Math.PI,aJ,44),[[onR(11.5,10.12)[0],10.12,0],[5.78,10.515,0]]];}
+  return axs([arcA(0,12,aL,Math.PI,44),arcA(0,11.5,Math.PI,aJ,44),[[onR(11.5,10.12)[0],10.12,0],[5.78,10.515,0]]]);}
 function corneaSegs(){const a0=Math.asin(5.78/7.8),a1=Math.asin(5.46/7.3);
   return [arcA(5.28,7.8,0,a0,24),[[5.78,10.515,0],[5.46,10.12,0]],arcA(5.28,7.3,a1,0,24)];}
 function choroidSegs(g){const ao=Math.acos(g.yo/11.5),ai=Math.acos((g.yo+0.1)/11.15);
-  return [arcA(0,11.5,Math.PI,ao,40),[[g.O[0],g.O[1],0],[onR(11.15,g.yo+0.1)[0],g.yo+0.1,0]],arcA(0,11.15,ai,Math.PI,40)];}
+  return axs([arcA(0,11.5,Math.PI,ao,40),[[g.O[0],g.O[1],0],[onR(11.15,g.yo+0.1)[0],g.yo+0.1,0]],arcA(0,11.15,ai,Math.PI,40)]);}
 function retinaSegs(g){const y=g.yo-0.05,ao=Math.acos(y/11.15),ai=Math.acos(y/10.95);
-  return [arcA(0,11.15,Math.PI,ao,40),[[onR(11.15,y)[0],y,0],[onR(10.95,y)[0],y,0]],arcA(0,10.95,ai,Math.PI,40)];}
+  return axs([arcA(0,11.15,Math.PI,ao,40),[[onR(11.15,y)[0],y,0],[onR(10.95,y)[0],y,0]],arcA(0,10.95,ai,Math.PI,40)]);}
 function ciliarySegs(g){
   const outer=[];for(let i=0;i<=8;i++){const y=lerp(9.6,g.yo,i/8);outer.push([onR(11.5,y)[0],y,0]);}
   const tip=[[g.O[0],g.O[1],0],[g.Oin[0],g.Oin[1],0]];
@@ -408,7 +400,7 @@ function ciliarySegs(g){
 function lensSegs(g){const o=[];for(let i=0;i<=48;i++){const p=lensPt(g,Math.PI*i/48);o.push([p[0],p[1],0]);}return [o];}
 function irisSegs(g){
   const yb=lensY(g,g.p)+0.08,back=[];for(let i=0;i<=6;i++){const r=lerp(g.p,IRB[0],i/6);back.push([r,irisBackY(g,r),0]);}
-  const mid=lerp(g.p,IRF[0],0.45),front=[];
+  const front=[];
   const fy=r=>{const base=lerp(yb+0.22,IRF[1],(r-g.p)/(IRF[0]-g.p));const bulge=0.16*Math.sin(Math.PI*clamp((r-g.p)/(IRF[0]-g.p),0,1));return base+bulge;};
   for(let i=0;i<=8;i++){const r=lerp(IRF[0],g.p,i/8);front.push([r,fy(r),0]);}
   return [back,[[IRB[0],IRB[1],0],[IRF[0],IRF[1],0]],front,[[g.p,fy(g.p),0],[g.p,yb,0]]];
@@ -418,18 +410,81 @@ function hyaloidSeg(g){
   const o=[];for(let i=0;i<=14;i++){const u=i/14,a=(1-u)*(1-u),b=2*u*(1-u),c=u*u;o.push([a*base[0]+b*ctl[0]+c*W[0],a*base[1]+b*ctl[1]+c*W[1],0]);}
   for(let i=1;i<=10;i++){const th=lerp(125,180,i/10)*Math.PI/180,p=lensPt(g,th);o.push([p[0]*0.98,p[1]-0.16,0]);}
   return o;}
+/* spectacle lens: thin-lens optics at its mid-plane; drawn biconcave / biconvex (thickness exaggerated so the shape reads) */
+const YG=25.08,RG=8;
+function glassesSegs(P){const e=Math.min(2.4,0.3*Math.abs(P)),h=r=>P<0?0.42+e*(r/RG)*(r/RG):P>0?0.36+e*(1-(r/RG)*(r/RG)):0.5;
+  const front=[],back=[];for(let i=0;i<=14;i++){const r=RG*i/14;front.push([r,YG+h(r),0]);}for(let i=14;i>=0;i--){const r=RG*i/14;back.push([r,YG-h(r),0]);}
+  return [front,[[RG,YG+h(RG),0],[RG,YG-h(RG),0]],back];}
+
+/* ---------- optics (paraxial vergence; lengths in mm, powers in dioptres) ---------- */
+const NAQ=1.336,YC=13.08,RET=10.95,FC=1000*(NAQ-1)/7.8,VMAX=8,YSTART=40;
+let NL=1.4657;
+const yRet=()=>-RET*OPT.sax;
+const glassesP=()=>st.gl==='none'?null:(st.gl==='concave'?-1:1)*st.gp;
+const yObj=()=>st.obj<0.0005?Infinity:YC+1000/(VMAX*st.obj);
+function surfaces(g,P){const R1=g.a*g.a/g.bA,R2=g.a*g.a/g.bP,FL=1000*(NL-NAQ),S=[];
+  if(P!=null)S.push({y:YG,n:1,n2:1,F:P,k:'G'});
+  S.push({y:YC,n:1,n2:NAQ,F:FC,k:'C'});
+  S.push({y:g.yc+g.bA,n:NAQ,n2:NL,F:FL/R1,k:'L1'});
+  S.push({y:g.yc-g.bP,n:NL,n2:NAQ,F:FL/R2,k:'L2'});
+  return S;}
+/* forward: intermediate image after every surface; dF > 0 means the final focus lies in front of the retina */
+function fwd(g,P,yO){const S=surfaces(g,P);let V=isFinite(yO)?-1000/(yO-S[0].y):0,lp=Infinity;const img=[];
+  for(let i=0;i<S.length;i++){const s=S[i],Vp=V+s.F;lp=Math.abs(Vp)<1e-9?Infinity:1000*s.n2/Vp;img.push(isFinite(lp)?s.y-lp:null);
+    if(i<S.length-1){const ln=lp-(s.y-S[i+1].y);V=isFinite(ln)?1000*s.n2/ln:0;}}
+  const yI=img[img.length-1];return {S,img,yI,dF:yI==null?-Infinity:yI-yRet()};}
+/* reverse: object-side vergence at the first surface that would be imaged exactly on the retina */
+function needV(g,P){const S=surfaces(g,P);let yp=yRet(),V=0;
+  for(let i=S.length-1;i>=0;i--){const s=S[i],lp=s.y-yp,Vp=isFinite(lp)?(Math.abs(lp)<1e-9?1e9:1000*s.n2/lp):0;V=Vp-s.F;const l=Math.abs(V)<1e-12?-Infinity:1000*s.n/V;yp=s.y-l;}
+  return V;}
+function bisect(f,lo,hi,n){let flo=f(lo);for(let i=0;i<(n||50);i++){const m=(lo+hi)/2,fm=f(m);if((fm>0)===(flo>0)){lo=m;flo=fm;}else hi=m;}return (lo+hi)/2;}
+NL=bisect(n=>{NL=n;return fwd(geom(0),null,Infinity).dF;},1.37,1.6,60);
+function solveOpt(){OPT.sax=1;OPT.c0=0;if(st.eye==='normal')return;const Rx=(st.eye==='myopia'?-1:1)*st.sev;
+  const f=()=>fwd(geom(0),Rx,Infinity).dF;
+  if(st.cause==='axial')OPT.sax=bisect(s=>{OPT.sax=s;return f();},0.6,1.6,56);
+  else OPT.c0=bisect(c=>{OPT.c0=c;return f();},-2.5,2.5,56);}
+function solveT(){if(!st.auto)return st.tm;const P=glassesP(),yO=yObj(),f=t=>fwd(geom(t),P,yO).dF;
+  if(f(0)>=0)return 0;if(f(1)<=0)return 1;return bisect(f,0,1,36);}
+const norm=v=>{const l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l];};
+function hitSurf(k,Pt,D,g){
+  const ell=(ar,by,yc,first)=>{const A=D[0]*D[0]/(ar*ar)+D[1]*D[1]/(by*by),B=2*(Pt[0]*D[0]/(ar*ar)+(Pt[1]-yc)*D[1]/(by*by)),C=Pt[0]*Pt[0]/(ar*ar)+(Pt[1]-yc)*(Pt[1]-yc)/(by*by)-1;
+    const disc=B*B-4*A*C;if(disc<0)return null;const q=Math.sqrt(disc),s1=(-B-q)/(2*A),s2=(-B+q)/(2*A);
+    if(first)return s1>1e-7?s1:(s2>1e-7?s2:null);return s2>1e-7?s2:null;};
+  if(k==='G')return Math.abs(D[1])<1e-9?null:(YG-Pt[1])/D[1];
+  if(k==='C')return ell(7.8,7.8,5.28,true);
+  if(k==='L1')return ell(g.a,g.bA,g.yc,true);
+  if(k==='L2')return ell(g.a,g.bP,g.yc,false);
+  return ell(RET,RET*OPT.sax,0,false);}
+/* a ray bends where it meets each drawn surface and then heads for (or away from) that surface's paraxial image, so every ray reaches the same focus */
+function rayPath(h,g,F,yO){const S=F.S,y1=S[0].y;let Pt,D;
+  if(!isFinite(yO)){Pt=[h,YSTART];D=[0,-1];}
+  else{D=norm([h,y1-yO]);if(yO>YSTART){const s=(YSTART-yO)/D[1];Pt=[D[0]*s,YSTART];}else Pt=[0,yO];}
+  const pts=[Pt.slice()];let rL1=null;
+  for(let i=0;i<S.length;i++){const s=hitSurf(S[i].k,Pt,D,g);if(s==null)return null;Pt=[Pt[0]+D[0]*s,Pt[1]+D[1]*s];pts.push(Pt.slice());
+    if(S[i].k==='L1')rL1=Pt[0];
+    const yi=F.img[i];if(yi==null)D=[0,-1];else{let d=[-Pt[0],yi-Pt[1]];if(d[1]>0)d=[-d[0],-d[1]];D=norm(d);}}
+  const s=hitSurf('R',Pt,D,g);if(s==null)return null;Pt=[Pt[0]+D[0]*s,Pt[1]+D[1]*s];pts.push(Pt.slice());
+  return {pts,rL1};}
+function traceRays(g,F,yO){const out=[];
+  [0.3,0.62,0.92].forEach(fr=>{const target=fr*g.p*0.97;let h=1,r=rayPath(h,g,F,yO);
+    for(let k=0;k<3&&r&&r.rL1;k++){h*=target/r.rL1;r=rayPath(h,g,F,yO);}if(r)out.push(r);});
+  return out;}
 
 /* ---------- build scene objects ---------- */
 const grp={};
 function solid(k,mat,capMat){const G=new THREE.Group();G.userData.key=k;eye.add(G);const s=new Surf(mat),c1=new Cap(capMat),c2=new Cap(capMat);
   [s.mesh,c1.mesh,c2.mesh].forEach(m=>{m.userData.key=k;G.add(m);});grp[k]=G;return{s,c1,c2,G};}
 const SO={sclera:solid('sclera',MAT.sclera,MAT.scleraCap),cornea:solid('cornea',MAT.cornea,MAT.cornea),choroid:solid('choroid',MAT.choroid,MAT.choroidCap),
-  retina:solid('retina',MAT.retina,MAT.retinaCap),ciliary:solid('ciliary',MAT.cil,MAT.cilCap),lens:solid('lens',MAT.lens,MAT.lensCap),iris:solid('iris',MAT.iris,MAT.irisCap)};
-SO.cornea.G.renderOrder=3;SO.lens.G.renderOrder=2;
-const ZT=new Tubes(MAT.zon,5,14);/* ZT.M must match the point count passed to fiberPath */ZT.mesh.userData.key='zonule';grp.zonule=new THREE.Group();grp.zonule.add(ZT.mesh);eye.add(grp.zonule);
+  retina:solid('retina',MAT.retina,MAT.retinaCap),ciliary:solid('ciliary',MAT.cil,MAT.cilCap),lens:solid('lens',MAT.lens,MAT.lensCap),iris:solid('iris',MAT.iris,MAT.irisCap),
+  glasses:solid('glasses',MAT.glass,MAT.glassCap)};
+SO.cornea.G.renderOrder=3;SO.lens.G.renderOrder=2;SO.glasses.G.renderOrder=4;
+const ZT=new Tubes(MAT.zon,5,14);ZT.mesh.userData.key='zonule';grp.zonule=new THREE.Group();grp.zonule.add(ZT.mesh);eye.add(grp.zonule);
 const PT=new Tubes(MAT.post,5,18);PT.mesh.userData.key='ppz';grp.ppz=new THREE.Group();grp.ppz.add(PT.mesh);eye.add(grp.ppz);
-const RT=new Tubes(MAT.ray,5,30);RT.mesh.userData.key='ray';grp.ray=new THREE.Group();grp.ray.add(RT.mesh);eye.add(grp.ray);
-const objDot=new THREE.Mesh(new THREE.SphereGeometry(0.42,20,14),MAT.obj);grp.ray.add(objDot);
+grp.ray=new THREE.Group();eye.add(grp.ray);
+const RT=new Tubes(MAT.ray,6,48);RT.mesh.userData.key='ray';grp.ray.add(RT.mesh);
+const DT=new Tubes(MAT.dash,5,2);grp.ray.add(DT.mesh);
+const focusDot=new THREE.Mesh(new THREE.SphereGeometry(0.3,20,14),MAT.focus);focusDot.userData.key='focus';focusDot.renderOrder=6;grp.ray.add(focusDot);
+const glLines=[new THREE.Line(new THREE.BufferGeometry(),MAT.glLine),new THREE.Line(new THREE.BufferGeometry(),MAT.glLine)];glLines.forEach(l=>{l.renderOrder=7;grp.glasses.add(l);});
 const HY=new Surf(MAT.hyal);HY.mesh.userData.key='hyaloid';grp.hyaloid=new THREE.Group();grp.hyaloid.add(HY.mesh);eye.add(grp.hyaloid);
 const hyLines=[new THREE.Line(new THREE.BufferGeometry(),MAT.hyLine),new THREE.Line(new THREE.BufferGeometry(),MAT.hyLine)];hyLines.forEach(l=>grp.hyaloid.add(l));
 grp.ghost=new THREE.Group();grp.ghost.renderOrder=9;eye.add(grp.ghost);
@@ -439,17 +494,17 @@ function makeArrow(mat){const g=new THREE.Group();const sh=new THREE.Mesh(new TH
 const ARR=[];for(let i=0;i<10;i++){const a=makeArrow(MAT.arrow);grp.arrows.add(a);ARR.push(a);}
 const ARRC=[];for(let i=0;i<2;i++){const a=makeArrow(MAT.arrowC);grp.arrows.add(a);ARRC.push(a);}
 
-let G0=geom(0),G1=geom(1),G=G0,cutDirty=true;
-/* rest lengths: anterior-group zonules are taut when far (t=0); posterior (pars plana) zonules are taut when near (t=1) */
+let G0,G1,G,cutDirty=true;
 /* zonule fans: origins ordered front-to-back along the ciliary processes, insertions ordered the same way on the lens, so fibres never cross */
 const ZDEF=[{o:g=>mix(g.A,g.a2,.8),th:62,ph:-1,c:0},{o:g=>mix(g.A,g.a2,.45),th:74,ph:-1,c:0},{o:g=>g.A,th:90,ph:1,c:1},{o:g=>mix(g.A,g.pl1,.3),th:106,ph:1,c:2},{o:g=>mix(g.A,g.pl1,.45),th:115,ph:1,c:2}];
 function mix(a,b,u){return [lerp(a[0],b[0],u),lerp(a[1],b[1],u)];}
-/* posterior zonular system (Lütjen-Drecoll 2010): pars plana zonule from the zonular plexus behind the processes back to the insertion zone near the ora serrata (anchored in the elastic choroid, moves forward a little), and the intermediate vitreous zonule from the posterior pars plicata to the anterior vitreous membrane near the ora. Both are taut when the muscle contracts. */
+/* posterior zonular system (Lütjen-Drecoll 2010): pars plana zonule to the insertion zone near the ora serrata, intermediate vitreous zonule to the anterior vitreous membrane. Taut when the muscle contracts. */
 const PPZ={o:g=>mix(g.pl1,g.PP2,.2),e:g=>{const y=5.35+0.16*g.t;return [onR(10.95,y)[0]-0.1,y];}};
 const IVZ={o:g=>g.pl1,e:g=>{const h=hyaloidSeg(g)[3];return [h[0],h[1]];}};
 const dist2=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
-ZDEF.forEach(z=>{z.L=dist2(z.o(G0),lensPt(G0,z.th*Math.PI/180));});
-PPZ.L=dist2(PPZ.o(G1),PPZ.e(G1));IVZ.L=dist2(IVZ.o(G1),IVZ.e(G1));
+function computeRest(){G0=geom(0);G1=geom(1);ZDEF.forEach(z=>{z.L=dist2(z.o(G0),lensPt(G0,z.th*Math.PI/180));});
+  PPZ.L=dist2(PPZ.o(G1),PPZ.e(G1));IVZ.L=dist2(IVZ.o(G1),IVZ.e(G1));}
+computeRest();G=G0;
 const ZTAUT=[[0.97,0.79,0.42],[0.949,0.663,0.231],[0.88,0.53,0.16]],ZSLACK=[[0.46,0.42,0.34],[0.42,0.37,0.30],[0.39,0.32,0.25]],PTAUT=[0.33,0.82,0.43],PSLACK=[0.25,0.38,0.28],VTAUT=[0.62,0.87,0.36],VSLACK=[0.32,0.38,0.24];
 function fiberPath(S,E,L,n,ph,f,M){
   const d=S.distanceTo(E),ex=Math.max(0,L-d),h=ex>0?0.6*(2/(Math.PI*n))*Math.sqrt(d*ex):0;
@@ -474,12 +529,18 @@ function buildGhost(){
   const ring=(r,y,w)=>{const pts=[];for(let j=0;j<=N;j++){const f=f0+fl*j/N;pts.push(P(r-w*bump(f),y,f));}add(pts);};
   if(st.cut==='full'){ring(G0.a,G0.yc,0);ring(G0.A[0],G0.A[1],1);}
 }
+function resample(pts,M){const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+pts[i].distanceTo(pts[i-1]));const tot=L[L.length-1],o=[];
+  for(let k=0;k<M;k++){const s=tot*k/(M-1);let i=1;while(i<pts.length-1&&L[i]<s)i++;const u=(s-L[i-1])/((L[i]-L[i-1])||1);o.push(new V3().lerpVectors(pts[i-1],pts[i],clamp(u,0,1)));}return o;}
 
+let LAST=null,lastRad=0.05;
+const rayRad=()=>clamp(cam.r*0.00085,0.014,0.05);
 function updateGeo(){
   const g=geom(st.t);G=g;const [f0,fl]=CUT();
   if(cutDirty){setSolid(SO.sclera,scleraSegs(),96);setSolid(SO.cornea,corneaSegs(),96);buildGhost();}
   setSolid(SO.choroid,choroidSegs(g),96);setSolid(SO.retina,retinaSegs(g),96);
   setSolid(SO.ciliary,ciliarySegs(g),NPROC*6,bump);setSolid(SO.lens,lensSegs(g),96);setSolid(SO.iris,irisSegs(g),128);
+  const Pg=glassesP();grp.glasses.visible=Pg!=null;if(Pg!=null){const gs=glassesSegs(Pg);setSolid(SO.glasses,gs,96);const poly=flat(ccw(gs)),cg=capAngles();
+    glLines.forEach((l,i)=>{l.visible=!!cg[i];if(cg[i]){l.geometry.dispose();l.geometry=new THREE.BufferGeometry().setFromPoints(poly.concat([poly[0]]).map(q=>P(q[0],q[1],cg[i][0])));}});}
   const vs=valleys(),paths=[];
   vs.forEach((f,vi)=>ZDEF.forEach((z,zi)=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);
     const fp=fiberPath(P(o[0],o[1],f),P(e[0],e[1],f),z.L,1,z.ph,f,ZT.M);
@@ -491,14 +552,16 @@ function updateGeo(){
     PT.set(pp,0.04);
     const hs=hyaloidSeg(g);HY.set([hs],f0,fl,Math.max(8,Math.ceil(96*fl/TAU)),null);
     const ca=capAngles();hyLines.forEach((l,i)=>{l.visible=!!ca[i];if(ca[i]){l.geometry.dispose();l.geometry=new THREE.BufferGeometry().setFromPoints(hs.map(p=>P(p[0],p[1],ca[i][0])));}});}
-  /* light rays in the midline section (phi = UP and DN) */
-  const rp=[];
-  if(st.ray){const ratio=lerp(0.88,0.97,st.t);[0.45,0.9].forEach(fr=>[UP,DN].forEach(f=>{
-      const hl=g.p*0.8*fr,hc=hl/ratio,yC=5.28+Math.sqrt(60.84-hc*hc),yL=lensY(g,hl);
-      const poly=[[hc*(1-st.t),26],[hc,yC],[hl,yL],[0,-10.95]].map(p=>P(p[0],p[1],f));
-      rp.push({pts:resample(poly,30),b:new V3(Math.cos(f),0,-Math.sin(f))});}));
-    MAT.obj.opacity=st.t;objDot.position.set(0,26,0);}
-  rp.forEach(p=>p.c=[1,0.83,0.36]);RT.set(rp,0.05);
+  /* light rays in the midline section (phi = UP and DN), traced through the current optics */
+  const rp=[],dp=[];
+  if(st.ray&&LAST){LAST.rays.forEach(r=>[UP,DN].forEach(f=>{const b=new V3(Math.cos(f),0,-Math.sin(f));
+      rp.push({pts:resample(r.pts.map(p=>P(p[0],p[1],f)),RT.M),b,c:[1,0.83,0.36]});
+      const F=LAST.F;if(F.yI!=null&&F.dF<-0.03&&F.yI>yRet()-14){const a=P(r.pts[r.pts.length-1][0],r.pts[r.pts.length-1][1],f),z=P(0,F.yI,f),L=a.distanceTo(z),n=Math.max(1,Math.floor(L/0.6));
+        for(let i=0;i<n;i++){const u0=i/n,u1=Math.min(1,u0+0.55/n*1.0);dp.push({pts:[new V3().lerpVectors(a,z,u0),new V3().lerpVectors(a,z,u1)],b,c:[1,0.83,0.36]});}}}));}
+  const rr=rayRad();lastRad=rr;RT.set(rp,rr);DT.set(dp,rr*0.7);
+  const F=LAST&&LAST.F;const fv=st.ray&&F&&F.yI!=null&&F.yI>yRet()-14&&F.yI<YC;focusDot.visible=!!fv;
+  focusDot.scale.setScalar(rr/0.05);
+  if(fv){focusDot.position.set(0,F.yI,0);MAT.focus.color.setHex(Math.abs(F.dF)<0.03?0x5FD08A:0xFF9B54);}
   /* arrows: contraction direction of the ciliary ring, and the forward pull on the choroid */
   const op=clamp(st.t*1.6,0,1)*0.95;MAT.arrow.opacity=op;MAT.arrowC.opacity=op;
   const dA=new THREE.Vector2(G1.A[0]-G0.A[0],G1.A[1]-G0.A[1]).normalize();
@@ -513,37 +576,38 @@ function updateGeo(){
       const tdir=new V3(-ry*Math.sin(f),rr,-ry*Math.cos(f)).normalize();
       place(ARRC[ii],P(rr,ry,f).addScaledVector(nrm,.14).addScaledVector(tdir,-0.5),tdir);});
   }else{ARRC.forEach(a=>a.visible=false);}
-  if(st.cut==='full'){const n=8;for(let i=0;i<n&&used<ARR.length;i++){const f=i*TAU/8+UP;
+  if(st.cut==='full'){for(let i=0;i<8&&used<ARR.length;i++){const f=i*TAU/8+UP;
       const fp=mix(g.A,g.F,.55);const dir=new V3(dA.x*Math.sin(f),dA.y,dA.x*Math.cos(f));
       place(ARR[used++],P(fp[0],fp[1]+0.45,f).addScaledVector(dir,-0.5),dir);}}
   for(;used<ARR.length;used++)ARR[used].visible=false;
   MAT.ghost.opacity=0.85*clamp(st.t*4,0,1);
   cutDirty=false;labelsDirty=true;
 }
-function resample(pts,M){const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+pts[i].distanceTo(pts[i-1]));const tot=L[L.length-1],o=[];
-  for(let k=0;k<M;k++){const s=tot*k/(M-1);let i=1;while(i<pts.length-1&&L[i]<s)i++;const u=(s-L[i-1])/((L[i]-L[i-1])||1);o.push(new V3().lerpVectors(pts[i-1],pts[i],clamp(u,0,1)));}return o;}
 
 function applyVis(){
   grp.cornea.visible=st.front;grp.iris.visible=st.front;grp.sclera.visible=st.sclera;grp.ray.visible=st.ray;
-  grp.ppz.visible=st.adv;grp.hyaloid.visible=st.adv;grp.ghost.visible=st.ghost;$('lg-adv').hidden=!st.adv;
+  grp.ppz.visible=st.adv;grp.hyaloid.visible=st.adv;grp.ghost.visible=st.ghost;$('lg-adv').hidden=!st.adv;$('r7').hidden=!st.adv;
+  $('inFocus').hidden=!st.fin;$('inSee').hidden=!st.sin;$('insets').hidden=!st.fin&&!st.sin;
+  if(typeof viewOffset==='function'&&stageEl.clientWidth)viewOffset();
 }
 
 /* ---------- camera ---------- */
 const cam={target:new V3(-4.5,0,0),th:-0.55,ph:1.08,r:50};
 const VIEWS={
-  oblique:{cut:'quarter',front:true,sclera:true,ray:true,target:[-4.5,0,0],th:-0.55,ph:1.08,r:50},
-  side:{cut:'half',front:true,sclera:true,ray:true,target:[-3,0,0],th:0,ph:Math.PI/2,r:56},
-  front:{cut:'full',front:false,sclera:false,ray:false,target:[-7,0,0],th:-Math.PI/2,ph:Math.PI/2,r:44},
-  zoom:{cut:'half',front:true,sclera:true,ray:false,target:[-7.7,6.4,0],th:0.12,ph:1.42,r:16.5}
+  oblique:{cut:'quarter',front:true,sclera:true,ray:true,target:()=>glassesP()!=null?[-10,1,0]:[-4.5,0,0],th:-0.55,ph:1.08,r:()=>glassesP()!=null?66:52},
+  side:{cut:'half',front:true,sclera:true,ray:true,target:()=>[-6,0,0],th:0,ph:Math.PI/2,r:62},
+  front:{cut:'full',front:false,sclera:false,ray:false,target:()=>[-7,0,0],th:-Math.PI/2,ph:Math.PI/2,r:44},
+  zoom:{cut:'half',front:true,sclera:true,ray:false,target:()=>[-7.7,6.4,0],th:0.12,ph:1.42,r:16.5},
+  retina:{cut:'half',front:true,sclera:true,ray:true,target:()=>[RET*OPT.sax-3.5,0,0],th:0,ph:Math.PI/2,r:17}
 };
-let tween=null;
-function goView(name,instant){const v=VIEWS[name];occStale=true;st.cut=v.cut;st.front=v.front;st.sclera=v.sclera;st.ray=v.ray;geoDirty=true;cutDirty=true;syncUI();applyVis();
+let tween=null,curView='oblique';
+function goView(name,instant){const v=VIEWS[name];curView=name;occStale=true;st.cut=v.cut;st.front=v.front;st.sclera=v.sclera;st.ray=v.ray;geoDirty=true;cutDirty=true;syncUI();applyVis();
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===name?'true':'false'));
-  const to={target:new V3(...v.target),th:v.th,ph:v.ph,r:v.r};
+  const to={target:new V3(...v.target()),th:v.th,ph:v.ph,r:typeof v.r==='function'?v.r():v.r};
   if(instant||matchMedia('(prefers-reduced-motion: reduce)').matches){cam.target.copy(to.target);cam.th=to.th;cam.ph=to.ph;cam.r=to.r;tween=null;}
   else{let dth=to.th-cam.th;dth=((dth+Math.PI)%TAU+TAU)%TAU-Math.PI;tween={t0:performance.now(),dur:950,from:{target:cam.target.clone(),th:cam.th,ph:cam.ph,r:cam.r},to:{target:to.target,th:cam.th+dth,ph:to.ph,r:to.r}};}
   req();}
-function clearViewPressed(){document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed','false'));}
+function clearViewPressed(){curView=null;document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed','false'));}
 function stepTween(now){if(!tween)return false;const u=clamp((now-tween.t0)/tween.dur,0,1),e=u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;
   cam.target.lerpVectors(tween.from.target,tween.to.target,e);cam.th=lerp(tween.from.th,tween.to.th,e);cam.ph=lerp(tween.from.ph,tween.to.ph,e);cam.r=lerp(tween.from.r,tween.to.r,e);
   if(u>=1)tween=null;return true;}
@@ -561,13 +625,13 @@ canvas.addEventListener('pointermove',e=>{const prev=ptr.get(e.pointerId);if(!pr
   if(ptr.size===1&&down){if(Math.hypot(cur.x-down.x,cur.y-down.y)>6)down.moved=true;
     if(down.moved){const dx=cur.x-prev.x,dy=cur.y-prev.y;if(down.pan)pan(dx,dy);else{cam.th-=dx*0.0075;cam.ph=clamp(cam.ph-dy*0.0075,0.12,Math.PI-0.12);}clearViewPressed();}}
   else if(ptr.size===2){let other=null;ptr.forEach((v,k)=>{if(k!==e.pointerId)other=v;});
-    const d0=Math.hypot(prev.x-other.x,prev.y-other.y),d1=Math.hypot(cur.x-other.x,cur.y-other.y);if(d0>0&&d1>0)cam.r=clamp(cam.r*d0/d1,8,120);
+    const d0=Math.hypot(prev.x-other.x,prev.y-other.y),d1=Math.hypot(cur.x-other.x,cur.y-other.y);if(d0>0&&d1>0)cam.r=clamp(cam.r*d0/d1,6,140);
     pan((cur.x-prev.x)/2,(cur.y-prev.y)/2);clearViewPressed();}
   ptr.set(e.pointerId,cur);camMoved=true;req();});
 function endPtr(e){if(!ptr.has(e.pointerId))return;ptr.delete(e.pointerId);
   if(ptr.size===0&&down&&!down.moved&&performance.now()-down.t<550&&e.type==='pointerup')pick(e.clientX,e.clientY);if(ptr.size===0)down=null;}
 canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);
-canvas.addEventListener('wheel',e=>{e.preventDefault();cam.r=clamp(cam.r*Math.exp(e.deltaY*0.0012),8,120);tween=null;clearViewPressed();camMoved=true;req();},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();cam.r=clamp(cam.r*Math.exp(e.deltaY*0.0012),6,140);tween=null;clearViewPressed();camMoved=true;req();},{passive:false});
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 stageEl.addEventListener('gesturestart',e=>e.preventDefault());
 if(matchMedia('(pointer: fine)').matches)$('hint').textContent='拖動旋轉 · 滾輪縮放 · 右鍵拖動平移';
@@ -576,11 +640,22 @@ const ray=new THREE.Raycaster();
 function visibleMesh(o){for(let x=o;x;x=x.parent)if(!x.visible)return false;return true;}
 function pickables(){const o=[];eye.traverse(m=>{if(m.isMesh&&m.userData.key&&visibleMesh(m))o.push(m);});return o;}
 function pick(cx,cy){const r=canvas.getBoundingClientRect();const v=new THREE.Vector2((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);
-  ray.setFromCamera(v,camera);const hits=ray.intersectObjects(pickables(),false);
-  let h=hits.find(x=>x.object.userData.key!=='cornea'&&x.object.userData.key!=='hyaloid')||hits[0];
-  if(!h){select(null);return;}let k=h.object.userData.key;if(k==='lens'||k==='ciliary'||k==='iris'){}select(k);}
+  ray.near=0;ray.far=Infinity;ray.setFromCamera(v,camera);const hits=ray.intersectObjects(pickables(),false);
+  const h=hits.find(x=>!['cornea','hyaloid','glasses'].includes(x.object.userData.key))||hits[0];
+  select(h?h.object.userData.key:null);}
+
+/* ---------- formatting ---------- */
+const MINUS='−';
+const fmtP=P=>(P<0?MINUS:P>0?'+':'')+Math.abs(P).toFixed(2)+' D';
+const fmtDeg=D=>Math.round(Math.abs(D)*100)+' 度';
+function fmtDist(){if(st.obj<0.0005)return '無限遠';const mm=1000/(VMAX*st.obj);return mm>=1000?(mm/1000).toFixed(1)+' 米':Math.round(mm/10)+' 厘米';}
+function focusText(F,short){if(F.yI==null||!isFinite(F.dF))return short?'在視網膜後很遠':'焦點：在視網膜後很遠的地方';
+  const d=F.dF;if(Math.abs(d)<0.03)return short?'在視網膜上':'焦點：在視網膜上';
+  return (short?'':'焦點：')+(d>0?'在視網膜前 ':'在視網膜後 ')+Math.abs(d).toFixed(2)+' 毫米';}
 
 /* ---------- labels ---------- */
+function rayAnchor(){if(!LAST||!LAST.rays.length)return P(0,30,UP);const p=LAST.rays[LAST.rays.length-1].pts;const yq=Math.min(p[0][1]-0.5,(glassesP()!=null?YG:YC)+7);
+  for(let i=0;i<p.length-1;i++)if(p[i][1]>=yq&&p[i+1][1]<=yq){const u=(p[i][1]-yq)/((p[i][1]-p[i+1][1])||1);return P(lerp(p[i][0],p[i+1][0],u),yq,UP);}return P(p[0][0],p[0][1],UP);}
 const LB=[
   {k:'cornea',t:'角膜',f:g=>P(3.4,5.28+Math.sqrt(60.84-11.56),UP)},
   {k:'iris',t:'虹膜',f:g=>{const r=lerp(g.p,IRB[0],.5);return P(r,irisBackY(g,r)+0.2,DN);}},
@@ -588,33 +663,37 @@ const LB=[
   {k:'ciliary',t:'睫狀體',f:g=>{const r=(g.A[0]+onR(11.5,g.A[1])[0])/2;return P(r,g.A[1]-0.25,UP);}},
   {k:'zonule',t:'懸韌帶',f:g=>{const f=UP+Math.PI/NPROC,e=lensPt(g,Math.PI/2);return P((g.A[0]+e[0])/2,(g.A[1]+e[1])/2,f);}},
   {k:'sclera',t:'鞏膜',f:g=>Ps(11.8,1.5,UP)},
-  {k:'choroid',t:'脈絡膜',f:g=>Ps(11.33,-5,UP)},
-  {k:'retina',t:'視網膜',f:g=>Ps(11.05,-7.5,DN)},
+  {k:'choroid',t:'脈絡膜',f:g=>{const p=Ps(11.33,-5,UP);p.y=axy(p.y);return p;}},
+  {k:'retina',t:'視網膜',f:g=>{const p=Ps(11.05,-7.5,DN);p.y=axy(p.y);return p;}},
   {k:'vitreous',t:'玻璃體',f:g=>P(3.6,-1,UP),when:()=>st.cut!=='full'},
-  {k:'ray',t:'光線',f:g=>{const hc=g.p*0.8*0.9/lerp(0.88,0.97,g.t),yC=5.28+Math.sqrt(60.84-hc*hc),u=(26-19)/(26-yC);return P(hc*(1-g.t)+u*hc*g.t,19,UP);},when:()=>st.ray},
+  {k:'glasses',t:()=>(st.gl==='concave'?'凹透鏡 ':'凸透鏡 ')+fmtP(glassesP()),f:g=>P(RG-0.6,YG+1.4,UP),when:()=>st.gl!=='none'},
+  {k:'ray',t:()=>st.obj<0.0005?'平行光（遠處物體）':'光線（物體在 '+fmtDist()+'）',f:g=>rayAnchor(),when:()=>st.ray},
+  {k:'focus',t:'焦點',f:g=>P(0,LAST&&LAST.F.yI!=null?LAST.F.yI:0,UP),when:()=>st.ray&&focusDot.visible},
   {k:'ppz',t:'後部懸韌帶',f:g=>{const o=PPZ.o(g),e=PPZ.e(g),f=valleys()[0]||UP;return P((o[0]+e[0])/2,(o[1]+e[1])/2,f);},when:()=>st.adv},
   {k:'hyaloid',t:'玻璃體前界膜',f:g=>{const h=hyaloidSeg(g)[9];return P(h[0],h[1],DN);},when:()=>st.adv}
 ];
-const OWN={cornea:'cornea',iris:'iris',lens:'lens',ciliary:'ciliary',zonule:'zonule',sclera:'sclera',choroid:'choroid',retina:'retina',vitreous:null,ray:'ray',ppz:'ppz',hyaloid:'hyaloid'};
+const OWN={cornea:'cornea',iris:'iris',lens:'lens',ciliary:'ciliary',zonule:'zonule',sclera:'sclera',choroid:'choroid',retina:'retina',vitreous:null,ray:'ray',ppz:'ppz',hyaloid:'hyaloid',glasses:'glasses',focus:'focus'};
 const labelsEl=$('labels'),leaders=$('leaders');
-LB.forEach(L=>{const b=document.createElement('button');b.type='button';b.className='lbl off';b.textContent=L.t;b.dataset.k=L.k;
+LB.forEach(L=>{const b=document.createElement('button');b.type='button';b.className='lbl off';b.textContent=typeof L.t==='function'?'':L.t;b.dataset.k=L.k;
   b.addEventListener('click',()=>select(L.k));labelsEl.appendChild(b);L.el=b;});
 let labelsDirty=true,occStale=true,idleT=0,occCache={};
 function occluders(){const o=[];['sclera','iris','choroid','retina','ciliary'].forEach(k=>{if(visibleMesh(grp[k]))grp[k].traverse(m=>{if(m.isMesh&&m.visible)o.push(m);});});return o;}
 function updateLabels(force){
-  const w=stageEl.clientWidth,h=stageEl.clientHeight;
+  const w=stageEl.clientWidth,h=stageEl.clientHeight,ins=$('insets'),rightLim=ins.hidden?6:ins.offsetWidth+20;
   const doOcc=!!force;const occ=doOcc?occluders():null;
   const c0=eye.localToWorld(new V3(0,5,0)).project(camera),cx=(c0.x+1)/2*w,cy=(1-c0.y)/2*h;
   const items=[];
   LB.forEach(L=>{let on=st.lab&&(!L.when||L.when());
     if((L.k==='cornea'||L.k==='iris')&&!st.front)on=false;if(L.k==='sclera'&&!st.sclera)on=false;
     if(!on){L.el.classList.add('off');return;}
+    if(typeof L.t==='function'){const tx=L.t();if(L.el.textContent!==tx)L.el.textContent=tx;}
     const wp=eye.localToWorld(L.f(G).clone()),pr=wp.clone().project(camera);
     if(pr.z>1||pr.z<-1||Math.abs(pr.x)>1.1||Math.abs(pr.y)>1.1){L.el.classList.add('off');return;}
     if(doOcc){const dir=new V3().subVectors(wp,camera.position),d=dir.length();ray.set(camera.position,dir.normalize());ray.far=d-0.08;ray.near=0;
       const hit=ray.intersectObjects(occ,false)[0];occCache[L.k]=!hit||(OWN[L.k]&&hit.object.userData.key===OWN[L.k]);}
     if(occCache[L.k]===false){L.el.classList.add('off');return;}
     const ax=(pr.x+1)/2*w,ay=(1-pr.y)/2*h;let dx=ax-cx,dy=ay-cy,len=Math.hypot(dx,dy);if(len<24){dx=-0.7;dy=-0.7;len=1;}dx/=len;dy/=len;
+    if(L.k==='focus'){dx=0.35;dy=1;}
     const bw=L.el.offsetWidth||60,bh=L.el.offsetHeight||24;let lx=ax+dx*34,ly=ay+dy*30;
     let left=dx<0?lx-bw:lx,top=ly-bh/2;
     items.push({L,ax,ay,left,top,bw,bh});});
@@ -622,83 +701,137 @@ function updateLabels(force){
     if(a.left<b.left+b.bw+4&&b.left<a.left+a.bw+4&&a.top<b.top+b.bh+3&&b.top<a.top+a.bh+3){const push=(Math.min(a.top+a.bh,b.top+b.bh)-Math.max(a.top,b.top)+4)/2;
       if(a.top<b.top){a.top-=push;b.top+=push;}else{a.top+=push;b.top-=push;}}}
   let svg='';
-  items.forEach(o=>{o.left=clamp(o.left,6,w-o.bw-6);o.top=clamp(o.top,52,h-o.bh-50);
+  items.forEach(o=>{o.left=clamp(o.left,6,Math.max(6,w-o.bw-rightLim));o.top=clamp(o.top,84,h-o.bh-50);
     o.L.el.style.transform=`translate(${o.left.toFixed(1)}px,${o.top.toFixed(1)}px)`;o.L.el.classList.remove('off');o.L.el.classList.toggle('sel',st.sel===o.L.k);
     const ex=o.left+(o.left+o.bw/2<o.ax?o.bw:0),ey=o.top+o.bh/2;
     svg+=`<line x1="${o.ax.toFixed(1)}" y1="${o.ay.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="rgba(232,238,243,.55)" stroke-width="1"/><circle cx="${o.ax.toFixed(1)}" cy="${o.ay.toFixed(1)}" r="2.6" fill="#FFD45C"/>`;});
   leaders.innerHTML=svg;labelsDirty=false;
 }
 
+/* ---------- insets: magnified focus near the retina, and the image the eye sees ---------- */
+function drawInsets(){if(!LAST)return;const F=LAST.F,W=240,H=150,yR=yRet(),y0=yR+6.5,k=W/9.5,X=y=>(y0-y)*k,Yv=r=>H/2-r*k;
+  if(st.fin){
+    const band=(r1,r2,col)=>{let d='';const N=24;for(let i=0;i<=N;i++){const r=-3+6*i/N;d+=(i?'L':'M')+X(-Math.sqrt(Math.max(0,1-r*r/(r1*r1)))*r1*OPT.sax).toFixed(1)+' '+Yv(r).toFixed(1);}
+      for(let i=N;i>=0;i--){const r=-3+6*i/N;d+='L'+X(-Math.sqrt(Math.max(0,1-r*r/(r2*r2)))*r2*OPT.sax).toFixed(1)+' '+Yv(r).toFixed(1);}return `<path d="${d}Z" fill="${col}"/>`;};
+    let s='<defs><clipPath id="fclip"><rect width="240" height="150"/></clipPath></defs><g clip-path="url(#fclip)"><rect width="240" height="150" fill="#0B1A26"/>'+band(10.95,11.15,'#C97C66')+band(11.15,11.5,'#5B2421')+band(11.5,12,'#EEE7DA');
+    s+=`<line x1="0" y1="75" x2="240" y2="75" stroke="rgba(232,238,243,.18)" stroke-dasharray="3 4"/>`;
+    LAST.rays.forEach(r=>[1,-1].forEach(sg=>{s+=`<polyline fill="none" stroke="#FFD45C" stroke-width="1.6" points="${r.pts.map(p=>X(p[1]).toFixed(1)+','+Yv(sg*p[0]).toFixed(1)).join(' ')}"/>`;
+      if(F.yI!=null&&F.dF<-0.03){const e=r.pts[r.pts.length-1];s+=`<line x1="${X(e[1]).toFixed(1)}" y1="${Yv(sg*e[0]).toFixed(1)}" x2="${X(F.yI).toFixed(1)}" y2="75" stroke="#FFD45C" stroke-width="1.2" stroke-dasharray="3 3" opacity=".75"/>`;}}));
+    if(F.yI!=null&&isFinite(F.dF)){const fx=X(F.yI),ok=Math.abs(F.dF)<0.03;if(fx>-10&&fx<250)s+=`<circle cx="${fx.toFixed(1)}" cy="75" r="4.5" fill="${ok?'#5FD08A':'#FF9B54'}" stroke="#0B1A26" stroke-width="1.5"/>`;}
+    s+=`<text x="${(X(yR)-6).toFixed(1)}" y="16" fill="#F0B49C" font-size="11" text-anchor="end">視網膜</text></g>`;
+    $('fsvg').innerHTML=s;$('fval').textContent=focusText(F,false);}
+  if(st.sin){const arcmin=Math.abs(LAST.dD)*(2*LAST.g.p)/1000*3437.75;const px=Math.min(9,arcmin*0.075);
+    $('chart').style.filter=px<0.12?'none':`blur(${px.toFixed(2)}px)`;$('sval').textContent=clearText(LAST.dD);}
+}
+const clearText=dD=>Math.abs(dD)<0.25?'清楚':Math.abs(dD)<0.75?'稍為模糊':'模糊';
+
 /* ---------- info panel ---------- */
 const INFO={
-  ciliary:{n:'睫狀體（裏面是睫狀肌）',x:'一圈環形的結構，圍在晶狀體外面，貼在鞏膜內側，裏面有睫狀肌。它的內側有大約 70 到 80 條皺褶，叫睫狀突，懸韌帶就從這裏伸向晶狀體。',
-    now:g=>g.t>=0.5?'睫狀肌正在收縮：整圈向前、向內移，圍成的環變小，離晶狀體更近。':'睫狀肌放鬆：環被脈絡膜的彈性拉回後外方，環比較大。'},
-  zonule:{n:'懸韌帶（睫狀小帶）',x:'很多條很細的纖維，從睫狀突之間伸出，連到晶狀體的前表面、邊緣和後表面，分成前後有序的幾組，把晶狀體吊在中間。懸韌帶自己不會收縮，它鬆還是緊，取決於兩端離得多遠。',
-    now:g=>g.t>=0.5?'兩端靠近了，纖維變彎、顏色變暗，對晶狀體的拉力變小。':'兩端離得遠，纖維被拉直、顏色發亮，把晶狀體四周往外拉。'},
-  lens:{n:'晶狀體',x:'透明、有彈性的雙凸結構，外面包著一層有彈性的囊膜。沒有外力拉它時，它會自己變得比較圓。',
-    now:g=>g.t>=0.5?'四周的拉力變小，晶狀體靠自身彈性變厚、變凸，折光能力變強。':'被懸韌帶往四周拉，變扁變薄，折光能力變弱。'},
-  iris:{n:'虹膜',x:'眼睛有顏色的部分，中間的孔就是瞳孔。看近時瞳孔會跟著縮小，這是近反射的一部分，可以讓看近處時更清楚。',
-    now:g=>g.t>=0.5?'看近：瞳孔縮小。':'看遠：瞳孔比較大。'},
-  cornea:{n:'角膜',x:'眼球最前面透明的一層，負責大部分的折光。它的形狀不會改變，所以看遠看近的調節要靠晶狀體。'},
-  sclera:{n:'鞏膜',x:'眼球白色、堅韌的外殼，保護眼球、維持形狀。睫狀體貼在它的內側。'},
+  ciliary:{n:'睫狀體（裏面是睫狀肌）',x:'一圈環形的結構，圍在晶狀體外面，貼在鞏膜內側，裏面有睫狀肌。內側大約有 70 到 80 條皺褶，叫睫狀突，懸韌帶從這裏伸向晶狀體。',
+    now:g=>g.t>=0.5?'睫狀肌收縮：整圈向前、向內移，圍成的環變小。':g.t>0.02?'睫狀肌稍為收縮。':'睫狀肌放鬆：環被脈絡膜的彈性拉回後外方，環比較大。'},
+  zonule:{n:'懸韌帶（睫狀小帶）',x:'很多條很細的纖維，從睫狀突之間伸出，連到晶狀體的前表面、邊緣和後表面，把晶狀體吊在中間。懸韌帶自己不會收縮，它鬆還是緊，取決於兩端離得多遠。',
+    now:g=>g.t>=0.5?'兩端靠近了，纖維變彎、變暗，對晶狀體的拉力變小。':'兩端離得遠，纖維被拉直、發亮，把晶狀體四周往外拉。'},
+  lens:{n:'晶狀體',x:'透明、有彈性的雙凸結構，外面包著有彈性的囊膜。沒有外力拉它時，它會自己變得比較圓。',
+    now:g=>(g.t>=0.5?'四周拉力變小，晶狀體變厚、變凸，折光能力變強。':'被懸韌帶往四周拉，變扁變薄，折光能力變弱。')+(OPT.c0>0.005?'（這隻眼的晶狀體本身比正常凸）':OPT.c0<-0.005?'（這隻眼的晶狀體本身比正常扁）':'')},
+  iris:{n:'虹膜',x:'眼睛有顏色的部分，中間的孔就是瞳孔。看近時瞳孔會跟著縮小，這是近反射的一部分。',
+    now:g=>g.t>=0.5?'瞳孔縮小。':'瞳孔比較大。'},
+  cornea:{n:'角膜',x:'眼球最前面透明的一層，負責大部分的折光。它的形狀不會改變，看遠看近的調節要靠晶狀體。'},
+  sclera:{n:'鞏膜',x:'眼球白色、堅韌的外殼，保護眼球、維持形狀。',
+    now:()=>Math.abs(OPT.sax-1)>0.002?'這隻眼的眼球比正常'+(OPT.sax>1?'長 ':'短 ')+Math.abs((OPT.sax-1)*RET).toFixed(1)+' 毫米。':'眼球長度正常。'},
   choroid:{n:'脈絡膜',x:'鞏膜內側顏色很深、血管豐富的一層。它有彈性，向前連著睫狀體。睫狀肌收縮時把它往前拉；睫狀肌一放鬆，它的彈性就把睫狀體拉回原位，懸韌帶又被拉緊。',
-    now:g=>g.t>=0.5?'正被睫狀肌往前拉，像一條拉長了的彈簧（看黃色小箭頭）。':'已經回彈，把睫狀體拉回後外方。'},
-  retina:{n:'視網膜',x:'眼球最裏面的一層，有感光細胞。光線要準確聚在視網膜上，看到的東西才清楚。它的前緣叫鋸齒緣，再往前就是睫狀體。'},
+    now:g=>g.t>=0.5?'正被睫狀肌往前拉（看黃色小箭頭）。':'已經回彈，把睫狀體拉回後外方。'},
+  retina:{n:'視網膜',x:'眼球最裏面的一層，有感光細胞。光線要準確聚在視網膜上，看到的影像才清楚。前緣叫鋸齒緣。',now:()=>LAST?focusText(LAST.F,false)+'。':''},
   vitreous:{n:'玻璃體',x:'填滿晶狀體後面空間的透明膠狀物，幫助維持眼球的形狀。'},
-  ray:{n:'光線（示意）',x:'黃色線是從物體射進眼睛的光。這裏把折射簡化成在角膜和晶狀體各轉折一次。看遠時光幾乎是平行的；看近時光是散開的，晶狀體要更凸，才能把光聚到視網膜上。',
-    now:g=>g.t>0.05?'現在是近處物體射來的光（左邊的黃點），光線散開射入。':'現在是遠處射來的光，幾乎平行射入。'},
-  ppz:{n:'後部懸韌帶',adv:true,x:'懸韌帶系統往後延伸的部分：深綠色的一組從睫狀突後方沿著睫狀體平坦部，連到鋸齒緣附近；淺綠色的一組連到玻璃體前界膜。人眼裏有這些結構，是用電子顯微鏡觀察到的（Lütjen-Drecoll 等，2010）。',
-    now:g=>g.t>=0.5?'睫狀肌收縮：連晶狀體的懸韌帶變鬆，後部懸韌帶卻被往前拉緊（顏色發亮）。':'睫狀肌放鬆：後部懸韌帶變鬆，連晶狀體的懸韌帶重新拉緊。'},
-  hyaloid:{n:'玻璃體前界膜',adv:true,x:'包住玻璃體前面的一層透明薄膜，邊緣牢牢連在鋸齒緣附近，中間貼近晶狀體後面。淺綠色的後部懸韌帶連在它上面，看近時會牽拉它。'}
+  ray:{n:'光線',x:'黃色線是物體射進眼睛的光。光經過眼鏡、角膜和晶狀體前後表面時會折射。遠處物體的光差不多是平行的；近處物體的光是散開的。',
+    now:()=>st.obj<0.0005?'物體在無限遠，光線平行射入。':'物體在 '+fmtDist()+'，光線散開射入。'},
+  focus:{n:'焦點',x:'光線折射後會聚的地方。焦點要準確落在視網膜上，看到的影像才清楚。',now:()=>LAST?focusText(LAST.F,false)+'。':''},
+  glasses:{n:'眼鏡鏡片',x:'凹透鏡中間薄、邊緣厚，令光線散開，用來矯正近視；凸透鏡中間厚、邊緣薄，令光線會聚，用來矯正遠視。鏡片戴在眼前約 12 毫米。',
+    now:()=>{const P=glassesP();return P==null?'':(P<0?'凹透鏡 ':P>0?'凸透鏡 ':'平光鏡片 ')+fmtP(P)+'（'+fmtDeg(P)+'）。';}},
+  ppz:{n:'後部懸韌帶',adv:true,x:'懸韌帶系統往後延伸的部分：深綠色的一組沿著睫狀體平坦部連到鋸齒緣附近；淺綠色的一組連到玻璃體前界膜。',
+    now:g=>g.t>=0.5?'睫狀肌收縮：後部懸韌帶被往前拉緊（發亮）。':'睫狀肌放鬆：後部懸韌帶變鬆。'},
+  hyaloid:{n:'玻璃體前界膜',adv:true,x:'包住玻璃體前面的一層透明薄膜，邊緣連在鋸齒緣附近，中間貼近晶狀體後面。'}
 };
 function select(k){st.sel=k;
   Object.keys(HL).forEach(n=>HL[n].forEach(m=>{if(m.emissive)m.emissive.setHex(n===k?0x3a3226:0x000000);}));
   MAT.ray.color.setHex(k==='ray'?0xFFF0B0:0xFFD45C);
   renderInfo();labelsDirty=true;req();}
 function renderInfo(){const k=st.sel,I=k&&INFO[k];
-  if(!I){$('iname').textContent='點一下模型裏的結構';$('itext').textContent='也可以點畫面裏的標註。選中的結構會在模型裏變亮。';$('inow').hidden=true;$('itag').hidden=true;return;}
+  if(!I){$('iname').textContent='點一下模型裏的結構';$('itext').textContent='也可以點畫面裏的標註。';$('inow').hidden=true;$('itag').hidden=true;return;}
   $('iname').textContent=I.n;$('itext').textContent=I.x;$('itag').hidden=!I.adv;
-  if(I.now){$('inow').hidden=false;$('inow').textContent='現在：'+I.now(geom(st.t));}else $('inow').hidden=true;}
+  const nw=I.now?I.now(geom(st.t)):'';$('inow').hidden=!nw;$('inow').textContent=nw?'現在：'+nw:'';}
 
-/* ---------- readouts, chain, slider, autoplay ---------- */
-const S=$('s'),pill=$('pill');
-function setT(t,dir){st.t=t;geoDirty=true;tMoved=true;
-  $('o1').textContent=t<0.1?'放鬆':t<0.6?'開始收縮':'收縮';
-  $('o2').textContent=t<0.1?'拉緊':t<0.6?'開始變鬆':'鬆弛';
-  $('o7').textContent=t<0.1?'放鬆':t<0.6?'開始拉緊':'拉緊';
-  $('o3').textContent=t<0.1?'扁、薄':t<0.6?'開始變凸':'厚、凸';
-  $('o4').textContent=t<0.1?'較大':t<0.6?'開始縮小':'縮小';
-  const D=10*t;$('o5').textContent=D.toFixed(1)+' D';
-  $('o6').textContent=D<0.05?'遠處':(100/D>=100?(1/D).toFixed(1)+' 米':Math.round(100/D)+' 厘米');
-  const near=dir?dir==='near':t>=0.5,x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
+/* ---------- state → optics → readouts ---------- */
+const S=$('s'),TM=$('tm'),pill=$('pill'),pill2=$('pill2');
+let geoDirty=true,tMoved=false,lastDir=null;
+function recompute(dir){
+  const t=solveT();st.t=t;geoDirty=true;tMoved=true;if(dir!==undefined)lastDir=dir;
+  const g=geom(t),Pg=glassesP(),yO=yObj(),F=fwd(g,Pg,yO);
+  const Vobj=isFinite(yO)?-1000/(yO-F.S[0].y):0,dD=Vobj-needV(g,Pg),A=needV(geom(0),null)-needV(g,null);
+  LAST={g,F,dD,A,rays:traceRays(g,F,yO)};
+  $('o6').textContent=fmtDist();
+  $('o1').textContent=t<0.02?'放鬆':t<0.6?'稍為收縮':'收縮';
+  $('o2').textContent=t<0.02?'拉緊':t<0.6?'稍為變鬆':'鬆弛';
+  $('o7').textContent=t<0.02?'放鬆':t<0.6?'稍為拉緊':'拉緊';
+  $('o3').textContent=t<0.02?'最扁':t<0.6?'稍為變凸':'厚、凸';
+  $('o4').textContent=t<0.02?'較大':t<0.6?'稍為縮小':'縮小';
+  $('o5').textContent=Math.max(0,A).toFixed(1)+' D';
+  const ok=Math.abs(F.dF)<0.03;$('o8').textContent=focusText(F,true);$('o8').className='v '+(ok?'ok':'bad');
+  const ct=clearText(dD),clear=ct==='清楚';$('o9').textContent=ct;$('o9').className='v '+(clear?'ok':'bad');
+  pill2.textContent='影像'+ct+'：焦點'+focusText(F,true);pill2.className='pill '+(clear?'ok':'bad');
+  const near=lastDir?lastDir==='near':t>=0.5,x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
   document.querySelectorAll('#chain li').forEach((li,i)=>{li.textContent=near?li.dataset.b:li.dataset.a;li.classList.toggle('on',near&&x>=thr[i]);li.classList.toggle('on-far',!near&&x>=thr[i]);});
-  const pn=t>=0.5;pill.classList.toggle('near',pn);pill.textContent=pn?'看近：睫狀肌收縮':'看遠：睫狀肌放鬆';
-  if(st.sel&&INFO[st.sel]&&INFO[st.sel].now)$('inow').textContent='現在：'+INFO[st.sel].now(geom(t));
+  const pn=t>=0.02;pill.classList.toggle('near',pn);pill.textContent=(t<0.02?'睫狀肌放鬆':t<0.6?'睫狀肌稍為收縮':'睫狀肌收縮')+(st.obj<0.0005?'（看遠處）':'（看 '+fmtDist()+'）');
+  if(st.sel)renderInfo();
+  if(!st.auto)TM.value=Math.round(st.tm*1000);
   req();}
-let geoDirty=true,tMoved=false;
-S.addEventListener('input',()=>{stop();setT(S.value/1000);});
+
+/* ---------- controls ---------- */
+S.addEventListener('input',()=>{stop();st.obj=S.value/1000;lastDir=null;recompute();});
+TM.addEventListener('input',()=>{st.tm=TM.value/1000;lastDir=null;recompute();});
 let playing=false,p0=0;const btn=$('play');
 const PH=[3500,4500,5500,4500],TOT=18000;
-function stop(){if(playing){playing=false;btn.textContent='自動演示';req();}}
+function stop(){if(playing){playing=false;btn.textContent='自動演示';lastDir=null;req();}}
 function toggle(){if(playing)stop();else{playing=true;p0=0;btn.textContent='暫停';req();}}
 function playStep(now){if(!p0)p0=now;let m=(now-p0)%TOT,v,dir;
   if(m<PH[0]){v=0;dir='far';}else if((m-=PH[0])<PH[1]){v=m/PH[1];dir='near';}else if((m-=PH[1])<PH[2]){v=1;dir='near';}else{m-=PH[2];v=1-m/PH[3];dir='far';}
-  const e=v<0.5?2*v*v:1-Math.pow(-2*v+2,2)/2;S.value=Math.round(e*1000);setT(e,dir);}
+  const e=v<0.5?2*v*v:1-Math.pow(-2*v+2,2)/2;S.value=Math.round(e*1000);st.obj=e;recompute(dir);}
 btn.addEventListener('click',toggle);
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['BUTTON','INPUT'].includes(e.target.tagName)){e.preventDefault();toggle();}});
 $('present').addEventListener('click',e=>{const on=document.body.classList.toggle('present');e.currentTarget.textContent=on?'退出上課模式':'上課模式';e.currentTarget.blur();window.scrollTo(0,0);});
 
-function syncUI(){document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===st.cut?'true':'false'));
-  document.querySelectorAll('[data-opt]').forEach(b=>b.setAttribute('aria-pressed',st[b.dataset.opt]?'true':'false'));}
+function sevMax(){return st.eye==='hyper'&&st.cause==='lens'?5:8;}
+function eyeChanged(){const mx=sevMax();$('sev').max=mx*100;if(st.sev>mx)st.sev=mx;$('sev').value=Math.round(st.sev*100);
+  solveOpt();computeRest();cutDirty=true;occStale=true;syncUI();recompute();}
+function syncUI(){
+  document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===st.cut?'true':'false'));
+  document.querySelectorAll('[data-opt]').forEach(b=>b.setAttribute('aria-pressed',st[b.dataset.opt]?'true':'false'));
+  document.querySelectorAll('[data-eye]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.eye===st.eye?'true':'false'));
+  document.querySelectorAll('[data-cause]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cause===st.cause?'true':'false'));
+  document.querySelectorAll('[data-gl]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gl===st.gl?'true':'false'));
+  const ab=st.eye!=='normal';$('causeRow').hidden=!ab;$('sevRow').hidden=!ab;
+  $('cAx').textContent=st.eye==='hyper'?'眼球太短':'眼球太長';$('cLe').textContent=st.eye==='hyper'?'晶狀體太扁':'晶狀體太凸';
+  $('sevv').textContent=fmtDeg(st.sev)+'（'+st.sev.toFixed(2)+' D）';
+  $('gpRow').hidden=st.gl==='none';$('gpv').textContent=st.gl==='none'?'':fmtP(glassesP())+'（'+fmtDeg(st.gp)+'）';
+  $('crow').hidden=st.auto;}
 document.querySelectorAll('[data-cut]').forEach(b=>b.addEventListener('click',()=>{st.cut=b.dataset.cut;cutDirty=true;geoDirty=true;occStale=true;clearViewPressed();syncUI();req();}));
-document.querySelectorAll('[data-opt]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.opt;st[k]=!st[k];if(k==='adv'||k==='ray')geoDirty=true;
-  if(k==='adv'&&!st.adv&&(st.sel==='ppz'||st.sel==='hyaloid'))select(null);if(k==='adv')renderInfo();syncUI();applyVis();labelsDirty=true;occStale=true;req();}));
-document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{goView(b.dataset.view);geoDirty=true;}));
+document.querySelectorAll('[data-opt]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.opt;st[k]=!st[k];
+  if(k==='auto'){if(!st.auto){st.tm=st.t;TM.value=Math.round(st.tm*1000);}syncUI();recompute();return;}
+  if(k==='adv'||k==='ray')geoDirty=true;
+  if(k==='adv'&&!st.adv&&(st.sel==='ppz'||st.sel==='hyaloid'))select(null);syncUI();applyVis();drawInsets();labelsDirty=true;occStale=true;req();}));
+document.querySelectorAll('[data-eye]').forEach(b=>b.addEventListener('click',()=>{st.eye=b.dataset.eye;eyeChanged();}));
+document.querySelectorAll('[data-cause]').forEach(b=>b.addEventListener('click',()=>{st.cause=b.dataset.cause;eyeChanged();}));
+$('sev').addEventListener('input',e=>{st.sev=e.target.value/100;eyeChanged();});
+document.querySelectorAll('[data-gl]').forEach(b=>b.addEventListener('click',()=>{st.gl=b.dataset.gl;syncUI();occStale=true;recompute();}));
+$('gp').addEventListener('input',e=>{st.gp=e.target.value/100;syncUI();recompute();});
+$('fit').addEventListener('click',()=>{if(st.eye==='normal'){st.gl='none';}else{st.gl=st.eye==='myopia'?'concave':'convex';st.gp=st.sev;$('gp').value=Math.round(st.gp*100);}syncUI();occStale=true;recompute();});
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{goView(b.dataset.view);}));
 
 /* ---------- render loop (on demand) ---------- */
 let pending=false;
 function req(){if(!pending){pending=true;requestAnimationFrame(frame);}}
-function resize(){const w=stageEl.clientWidth,h=stageEl.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+function viewOffset(){const w=stageEl.clientWidth,h=stageEl.clientHeight,ins=$('insets');const off=(!ins.hidden&&w>=700)?(ins.offsetWidth+24)/2:0;
+  if(off>0)camera.setViewOffset(w,h,off,0,w,h);else camera.clearViewOffset();camera.updateProjectionMatrix();}
+function resize(){const w=stageEl.clientWidth,h=stageEl.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;viewOffset();
   if(geoDirty||cutDirty){updateGeo();geoDirty=false;}placeCam();renderer.render(scene,camera);labelsDirty=true;req();}
 new ResizeObserver(resize).observe(stageEl);
 let lastNow=0,ema=16,lowRes=false;
@@ -706,7 +839,8 @@ function frame(now){pending=false;
   if(lastNow&&(playing||tween)){const dt=now-lastNow;if(dt<500){ema=ema*0.9+dt*0.1;if(ema>48&&!lowRes&&renderer.getPixelRatio()>1){lowRes=true;renderer.setPixelRatio(1);resize();}}}lastNow=now;
   if(playing)playStep(now);
   const moving=stepTween(now);
-  if(geoDirty||cutDirty){updateGeo();geoDirty=false;}
+  if(st.ray&&Math.abs(rayRad()-lastRad)/lastRad>0.12)geoDirty=true;
+  if(geoDirty||cutDirty){updateGeo();geoDirty=false;drawInsets();}
   placeCam();renderer.render(scene,camera);
   const busy=moving||camMoved||playing||tMoved;if(busy)occStale=true;tMoved=false;
   updateLabels(!busy&&occStale);if(!busy)occStale=false;camMoved=false;
@@ -714,11 +848,15 @@ function frame(now){pending=false;
   if(playing||moving)req();}
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();stop();});
 
-/* hooks for checking the model's geometry */
-window.__eye={ug:()=>{const t0=performance.now();updateGeo();return performance.now()-t0;},occ:()=>{const t0=performance.now();updateLabels(true);return performance.now()-t0;},geom,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,post2d:t=>{const g=geom(t);return [PPZ,IVZ].map(Z=>{const o=Z.o(g),e=Z.e(g);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),Z.L,1,-1,UP,40).pts.map(v=>[v.x,v.y]);});},hy2d:t=>hyaloidSeg(geom(t)),fib2d:t=>{const g=geom(t);return ZDEF.map(z=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),z.L,1,z.ph,UP,40).pts.map(v=>[v.x,v.y]);});},setT:t=>{S.value=Math.round(t*1000);setT(t);},view:n=>goView(n,true),set:(k,v)=>{st[k]=v;if(k==='cut')cutDirty=true;geoDirty=true;syncUI();applyVis();req();},select,st,
-  frame:()=>{if(geoDirty||cutDirty){updateGeo();geoDirty=false;}placeCam();renderer.render(scene,camera);updateLabels(true);}};
+/* hooks for checking the model */
+window.__eye={proj:(x,y,z)=>{const v=eye.localToWorld(new V3(x,y,z)).project(camera),r=canvas.getBoundingClientRect();return [r.left+(v.x+1)/2*r.width,r.top+(1-v.y)/2*r.height];},st,OPT,geom,fwd,needV,solveOpt,solveT,traceRays,yRet,glassesP,yObj,surfaces,NL:()=>NL,last:()=>LAST,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,
+  fib2d:t=>{const g=geom(t);return ZDEF.map(z=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),z.L,1,z.ph,UP,40).pts.map(v=>[v.x,v.y]);});},
+  set:(o)=>{Object.assign(st,o);if('sev' in o||'eye' in o||'cause' in o){solveOpt();computeRest();cutDirty=true;}S.value=Math.round(st.obj*1000);syncUI();applyVis();recompute();},
+  view:n=>goView(n,true),select,
+  frame:()=>{if(geoDirty||cutDirty){updateGeo();geoDirty=false;drawInsets();}placeCam();renderer.render(scene,camera);updateLabels(true);}};
 
-applyVis();syncUI();goView('oblique',true);setT(0);resize();
+if(stageEl.clientWidth<600){st.fin=false;st.sin=false;}
+applyVis();syncUI();goView('oblique',true);recompute();resize();
 })();
 </script>
 </body>
