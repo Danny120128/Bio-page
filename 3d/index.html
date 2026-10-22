@@ -391,13 +391,13 @@ const IRB=[6.15,9.3],IRF=[6.22,9.62];
 function irisBackY(g,r){const yb=lensY(g,g.p)+0.08;return lerp(yb,IRB[1],(r-g.p)/(IRB[0]-g.p));}
 
 function scleraSegs(){const aL=Math.acos(10.515/12),aJ=Math.acos(10.12/11.5);
-  return [arcA(0,12,aL,Math.PI,64),arcA(0,11.5,Math.PI,aJ,64),[[onR(11.5,10.12)[0],10.12,0],[5.78,10.515,0]]];}
+  return [arcA(0,12,aL,Math.PI,44),arcA(0,11.5,Math.PI,aJ,44),[[onR(11.5,10.12)[0],10.12,0],[5.78,10.515,0]]];}
 function corneaSegs(){const a0=Math.asin(5.78/7.8),a1=Math.asin(5.46/7.3);
   return [arcA(5.28,7.8,0,a0,24),[[5.78,10.515,0],[5.46,10.12,0]],arcA(5.28,7.3,a1,0,24)];}
 function choroidSegs(g){const ao=Math.acos(g.yo/11.5),ai=Math.acos((g.yo+0.1)/11.15);
-  return [arcA(0,11.5,Math.PI,ao,60),[[g.O[0],g.O[1],0],[onR(11.15,g.yo+0.1)[0],g.yo+0.1,0]],arcA(0,11.15,ai,Math.PI,60)];}
+  return [arcA(0,11.5,Math.PI,ao,40),[[g.O[0],g.O[1],0],[onR(11.15,g.yo+0.1)[0],g.yo+0.1,0]],arcA(0,11.15,ai,Math.PI,40)];}
 function retinaSegs(g){const y=g.yo-0.05,ao=Math.acos(y/11.15),ai=Math.acos(y/10.95);
-  return [arcA(0,11.15,Math.PI,ao,60),[[onR(11.15,y)[0],y,0],[onR(10.95,y)[0],y,0]],arcA(0,10.95,ai,Math.PI,60)];}
+  return [arcA(0,11.15,Math.PI,ao,40),[[onR(11.15,y)[0],y,0],[onR(10.95,y)[0],y,0]],arcA(0,10.95,ai,Math.PI,40)];}
 function ciliarySegs(g){
   const outer=[];for(let i=0;i<=8;i++){const y=lerp(9.6,g.yo,i/8);outer.push([onR(11.5,y)[0],y,0]);}
   const tip=[[g.O[0],g.O[1],0],[g.Oin[0],g.Oin[1],0]];
@@ -425,7 +425,7 @@ function solid(k,mat,capMat){const G=new THREE.Group();G.userData.key=k;eye.add(
 const SO={sclera:solid('sclera',MAT.sclera,MAT.scleraCap),cornea:solid('cornea',MAT.cornea,MAT.cornea),choroid:solid('choroid',MAT.choroid,MAT.choroidCap),
   retina:solid('retina',MAT.retina,MAT.retinaCap),ciliary:solid('ciliary',MAT.cil,MAT.cilCap),lens:solid('lens',MAT.lens,MAT.lensCap),iris:solid('iris',MAT.iris,MAT.irisCap)};
 SO.cornea.G.renderOrder=3;SO.lens.G.renderOrder=2;
-const ZT=new Tubes(MAT.zon,5,18);ZT.mesh.userData.key='zonule';grp.zonule=new THREE.Group();grp.zonule.add(ZT.mesh);eye.add(grp.zonule);
+const ZT=new Tubes(MAT.zon,5,14);ZT.mesh.userData.key='zonule';grp.zonule=new THREE.Group();grp.zonule.add(ZT.mesh);eye.add(grp.zonule);
 const PT=new Tubes(MAT.post,5,18);PT.mesh.userData.key='ppz';grp.ppz=new THREE.Group();grp.ppz.add(PT.mesh);eye.add(grp.ppz);
 const RT=new Tubes(MAT.ray,5,30);RT.mesh.userData.key='ray';grp.ray=new THREE.Group();grp.ray.add(RT.mesh);eye.add(grp.ray);
 const objDot=new THREE.Mesh(new THREE.SphereGeometry(0.42,20,14),MAT.obj);grp.ray.add(objDot);
@@ -440,15 +440,16 @@ const ARRC=[];for(let i=0;i<2;i++){const a=makeArrow(MAT.arrowC);grp.arrows.add(
 
 let G0=geom(0),G1=geom(1),G=G0,cutDirty=true;
 /* rest lengths: anterior-group zonules are taut when far (t=0); posterior (pars plana) zonules are taut when near (t=1) */
-const ZDEF=[{o:g=>mix(g.A,g.pl1,.35),th:70},{o:g=>g.A,th:90},{o:g=>mix(g.A,g.pl1,.15),th:100}];
+/* zonule fans: origins ordered front-to-back along the ciliary processes, insertions ordered the same way on the lens, so fibres never cross */
+const ZDEF=[{o:g=>mix(g.A,g.a2,.8),th:62,ph:-1,c:0},{o:g=>mix(g.A,g.a2,.45),th:74,ph:-1,c:0},{o:g=>g.A,th:90,ph:1,c:1},{o:g=>mix(g.A,g.pl1,.3),th:106,ph:1,c:2},{o:g=>mix(g.A,g.pl1,.45),th:115,ph:1,c:2}];
 function mix(a,b,u){return [lerp(a[0],b[0],u),lerp(a[1],b[1],u)];}
 const PPZ={o:g=>mix(g.pl1,g.PP2,.5),e:[onR(10.95,5.35)[0]-0.1,5.35]};
 const dist2=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 ZDEF.forEach(z=>{z.L=dist2(z.o(G0),lensPt(G0,z.th*Math.PI/180));});
 PPZ.L=dist2(PPZ.o(G1),PPZ.e);
-const TAUT=[0.949,0.663,0.231],SLACK=[0.42,0.37,0.30],PTAUT=[0.25,0.78,0.68],PSLACK=[0.22,0.36,0.34];
+const ZTAUT=[[0.97,0.79,0.42],[0.949,0.663,0.231],[0.88,0.53,0.16]],ZSLACK=[[0.46,0.42,0.34],[0.42,0.37,0.30],[0.39,0.32,0.25]],PTAUT=[0.25,0.78,0.68],PSLACK=[0.22,0.36,0.34];
 function fiberPath(S,E,L,n,ph,f,M){
-  const d=S.distanceTo(E),ex=Math.max(0,L-d),h=ex>0?0.9*(2/(Math.PI*n))*Math.sqrt(d*ex):0;
+  const d=S.distanceTo(E),ex=Math.max(0,L-d),h=ex>0?0.6*(2/(Math.PI*n))*Math.sqrt(d*ex):0;
   const ephi=new V3(Math.cos(f),0,-Math.sin(f)),v=new V3().subVectors(E,S),dir=new V3().crossVectors(v,ephi).normalize();
   const pts=[];for(let i=0;i<M;i++){const u=i/(M-1);pts.push(new V3().lerpVectors(S,E,u).addScaledVector(dir,ph*h*Math.sin(n*Math.PI*u)));}
   return {pts,b:ephi,tension:clamp(d/L,0,1)};}
@@ -478,8 +479,8 @@ function updateGeo(){
   setSolid(SO.ciliary,ciliarySegs(g),NPROC*6,bump);setSolid(SO.lens,lensSegs(g),96);setSolid(SO.iris,irisSegs(g),128);
   const vs=valleys(),paths=[];
   vs.forEach((f,vi)=>ZDEF.forEach((z,zi)=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);
-    const fp=fiberPath(P(o[0],o[1],f),P(e[0],e[1],f),z.L,1,1,f,18);
-    fp.c=colMix(SLACK,TAUT,clamp((fp.tension-0.86)/0.14,0,1));paths.push(fp);}));
+    const fp=fiberPath(P(o[0],o[1],f),P(e[0],e[1],f),z.L,1,z.ph,f,14);
+    fp.c=colMix(ZSLACK[z.c],ZTAUT[z.c],clamp((fp.tension-0.86)/0.14,0,1));paths.push(fp);}));
   ZT.set(paths,0.034);
   if(st.adv){const pp=[];vs.forEach((f,vi)=>{if(vi%3&&vs.length>3)return;const o=PPZ.o(g);
       const fp=fiberPath(P(o[0],o[1],f),P(PPZ.e[0],PPZ.e[1],f),PPZ.L,1,-1,f,18);fp.c=colMix(PSLACK,PTAUT,clamp((fp.tension-0.86)/0.14,0,1));pp.push(fp);});
@@ -532,7 +533,7 @@ const VIEWS={
   zoom:{cut:'half',front:true,sclera:true,ray:false,target:[-8.25,5.5,0],th:0.12,ph:1.42,r:14.5}
 };
 let tween=null;
-function goView(name,instant){const v=VIEWS[name];st.cut=v.cut;st.front=v.front;st.sclera=v.sclera;st.ray=v.ray;geoDirty=true;cutDirty=true;syncUI();applyVis();
+function goView(name,instant){const v=VIEWS[name];occStale=true;st.cut=v.cut;st.front=v.front;st.sclera=v.sclera;st.ray=v.ray;geoDirty=true;cutDirty=true;syncUI();applyVis();
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===name?'true':'false'));
   const to={target:new V3(...v.target),th:v.th,ph:v.ph,r:v.r};
   if(instant||matchMedia('(prefers-reduced-motion: reduce)').matches){cam.target.copy(to.target);cam.th=to.th;cam.ph=to.ph;cam.r=to.r;tween=null;}
@@ -582,8 +583,8 @@ const LB=[
   {k:'lens',t:'晶状体',f:g=>P(1.7,g.yc,DN)},
   {k:'ciliary',t:'睫状体',f:g=>{const r=(g.A[0]+onR(11.5,g.A[1])[0])/2;return P(r,g.A[1]-0.25,UP);}},
   {k:'zonule',t:'悬韧带',f:g=>{const f=UP+Math.PI/NPROC,e=lensPt(g,Math.PI/2);return P((g.A[0]+e[0])/2,(g.A[1]+e[1])/2,f);}},
-  {k:'sclera',t:'巩膜',f:g=>Ps(11.8,-1.5,UP)},
-  {k:'choroid',t:'脉络膜',f:g=>Ps(11.33,-4,DN)},
+  {k:'sclera',t:'巩膜',f:g=>Ps(11.8,1.5,UP)},
+  {k:'choroid',t:'脉络膜',f:g=>Ps(11.33,-5,UP)},
   {k:'retina',t:'视网膜',f:g=>Ps(11.05,-7.5,DN)},
   {k:'vitreous',t:'玻璃体',f:g=>P(3.6,-1,UP),when:()=>st.cut!=='full'},
   {k:'ray',t:'光线',f:g=>{const hc=g.p*0.8*0.9/lerp(0.88,0.97,g.t),yC=5.28+Math.sqrt(60.84-hc*hc),u=(26-19)/(26-yC);return P(hc*(1-g.t)+u*hc*g.t,19,UP);},when:()=>st.ray},
@@ -594,12 +595,12 @@ const OWN={cornea:'cornea',iris:'iris',lens:'lens',ciliary:'ciliary',zonule:'zon
 const labelsEl=$('labels'),leaders=$('leaders');
 LB.forEach(L=>{const b=document.createElement('button');b.type='button';b.className='lbl off';b.textContent=L.t;b.dataset.k=L.k;
   b.addEventListener('click',()=>select(L.k));labelsEl.appendChild(b);L.el=b;});
-let labelsDirty=true,occFrame=0,occCache={};
+let labelsDirty=true,occStale=true,idleT=0,occCache={};
 function occluders(){const o=[];['sclera','iris','choroid','retina','ciliary'].forEach(k=>{if(visibleMesh(grp[k]))grp[k].traverse(m=>{if(m.isMesh&&m.visible)o.push(m);});});return o;}
 function updateLabels(force){
   const w=stageEl.clientWidth,h=stageEl.clientHeight;
   LB.find(l=>l.k==='zonule').el.textContent=st.adv?'前悬韧带':'悬韧带';
-  const doOcc=force||(occFrame++%5===0);const occ=doOcc?occluders():null;
+  const doOcc=!!force;const occ=doOcc?occluders():null;
   const c0=eye.localToWorld(new V3(0,5,0)).project(camera),cx=(c0.x+1)/2*w,cy=(1-c0.y)/2*h;
   const items=[];
   LB.forEach(L=>{let on=st.lab&&(!L.when||L.when());
@@ -609,7 +610,7 @@ function updateLabels(force){
     if(pr.z>1||pr.z<-1||Math.abs(pr.x)>1.1||Math.abs(pr.y)>1.1){L.el.classList.add('off');return;}
     if(doOcc){const dir=new V3().subVectors(wp,camera.position),d=dir.length();ray.set(camera.position,dir.normalize());ray.far=d-0.08;ray.near=0;
       const hit=ray.intersectObjects(occ,false)[0];occCache[L.k]=!hit||(OWN[L.k]&&hit.object.userData.key===OWN[L.k]);}
-    if(!occCache[L.k]){L.el.classList.add('off');return;}
+    if(occCache[L.k]===false){L.el.classList.add('off');return;}
     const ax=(pr.x+1)/2*w,ay=(1-pr.y)/2*h;let dx=ax-cx,dy=ay-cy,len=Math.hypot(dx,dy);if(len<24){dx=-0.7;dy=-0.7;len=1;}dx/=len;dy/=len;
     const bw=L.el.offsetWidth||60,bh=L.el.offsetHeight||24;let lx=ax+dx*34,ly=ay+dy*30;
     let left=dx<0?lx-bw:lx,top=ly-bh/2;
@@ -658,7 +659,7 @@ function renderInfo(){const k=st.sel,I=k&&INFO[k];
 
 /* ---------- readouts, chain, slider, autoplay ---------- */
 const S=$('s'),pill=$('pill');
-function setT(t,dir){st.t=t;geoDirty=true;
+function setT(t,dir){st.t=t;geoDirty=true;tMoved=true;
   $('o1').textContent=t<0.1?'放松':t<0.6?'开始收缩':'收缩';
   $('o2').textContent=t<0.1?'拉紧':t<0.6?'开始变松':'松弛';
   $('o3').textContent=t<0.1?'扁、薄':t<0.6?'开始变凸':'厚、凸';
@@ -670,11 +671,11 @@ function setT(t,dir){st.t=t;geoDirty=true;
   const pn=t>=0.5;pill.classList.toggle('near',pn);pill.textContent=pn?'看近：睫状肌收缩':'看远：睫状肌放松';
   if(st.sel&&INFO[st.sel]&&INFO[st.sel].now)$('inow').textContent='现在：'+INFO[st.sel].now(geom(t));
   req();}
-let geoDirty=true;
+let geoDirty=true,tMoved=false;
 S.addEventListener('input',()=>{stop();setT(S.value/1000);});
 let playing=false,p0=0;const btn=$('play');
 const PH=[3500,4500,5500,4500],TOT=18000;
-function stop(){if(playing){playing=false;btn.textContent='自动演示';}}
+function stop(){if(playing){playing=false;btn.textContent='自动演示';req();}}
 function toggle(){if(playing)stop();else{playing=true;p0=0;btn.textContent='暂停';req();}}
 function playStep(now){if(!p0)p0=now;let m=(now-p0)%TOT,v,dir;
   if(m<PH[0]){v=0;dir='far';}else if((m-=PH[0])<PH[1]){v=m/PH[1];dir='near';}else if((m-=PH[1])<PH[2]){v=1;dir='near';}else{m-=PH[2];v=1-m/PH[3];dir='far';}
@@ -685,9 +686,9 @@ $('present').addEventListener('click',e=>{const on=document.body.classList.toggl
 
 function syncUI(){document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===st.cut?'true':'false'));
   document.querySelectorAll('[data-opt]').forEach(b=>b.setAttribute('aria-pressed',st[b.dataset.opt]?'true':'false'));}
-document.querySelectorAll('[data-cut]').forEach(b=>b.addEventListener('click',()=>{st.cut=b.dataset.cut;cutDirty=true;geoDirty=true;clearViewPressed();syncUI();req();}));
+document.querySelectorAll('[data-cut]').forEach(b=>b.addEventListener('click',()=>{st.cut=b.dataset.cut;cutDirty=true;geoDirty=true;occStale=true;clearViewPressed();syncUI();req();}));
 document.querySelectorAll('[data-opt]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.opt;st[k]=!st[k];if(k==='adv'||k==='ray')geoDirty=true;
-  if(k==='adv'&&!st.adv&&(st.sel==='ppz'||st.sel==='hyaloid'))select(null);if(k==='adv')renderInfo();syncUI();applyVis();labelsDirty=true;occFrame=0;req();}));
+  if(k==='adv'&&!st.adv&&(st.sel==='ppz'||st.sel==='hyaloid'))select(null);if(k==='adv')renderInfo();syncUI();applyVis();labelsDirty=true;occStale=true;req();}));
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{goView(b.dataset.view);geoDirty=true;}));
 
 /* ---------- render loop (on demand) ---------- */
@@ -696,17 +697,21 @@ function req(){if(!pending){pending=true;requestAnimationFrame(frame);}}
 function resize(){const w=stageEl.clientWidth,h=stageEl.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
   if(geoDirty||cutDirty){updateGeo();geoDirty=false;}placeCam();renderer.render(scene,camera);labelsDirty=true;req();}
 new ResizeObserver(resize).observe(stageEl);
+let lastNow=0,ema=16,lowRes=false;
 function frame(now){pending=false;
+  if(lastNow&&(playing||tween)){const dt=now-lastNow;if(dt<500){ema=ema*0.9+dt*0.1;if(ema>48&&!lowRes&&renderer.getPixelRatio()>1){lowRes=true;renderer.setPixelRatio(1);resize();}}}lastNow=now;
   if(playing)playStep(now);
   const moving=stepTween(now);
   if(geoDirty||cutDirty){updateGeo();geoDirty=false;}
   placeCam();renderer.render(scene,camera);
-  updateLabels(!(moving||camMoved||playing));camMoved=false;
+  const busy=moving||camMoved||playing||tMoved;if(busy)occStale=true;tMoved=false;
+  updateLabels(!busy&&occStale);if(!busy)occStale=false;camMoved=false;
+  if(busy&&!playing&&!moving){clearTimeout(idleT);idleT=setTimeout(req,140);}
   if(playing||moving)req();}
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();stop();});
 
 /* hooks for checking the model's geometry */
-window.__eye={geom,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,setT:t=>{S.value=Math.round(t*1000);setT(t);},view:n=>goView(n,true),set:(k,v)=>{st[k]=v;if(k==='cut')cutDirty=true;geoDirty=true;syncUI();applyVis();req();},select,st,
+window.__eye={ug:()=>{const t0=performance.now();updateGeo();return performance.now()-t0;},occ:()=>{const t0=performance.now();updateLabels(true);return performance.now()-t0;},geom,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,fib2d:t=>{const g=geom(t);return ZDEF.map(z=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),z.L,1,z.ph,UP,40).pts.map(v=>[v.x,v.y]);});},setT:t=>{S.value=Math.round(t*1000);setT(t);},view:n=>goView(n,true),set:(k,v)=>{st[k]=v;if(k==='cut')cutDirty=true;geoDirty=true;syncUI();applyVis();req();},select,st,
   frame:()=>{if(geoDirty||cutDirty){updateGeo();geoDirty=false;}placeCam();renderer.render(scene,camera);updateLabels(true);}};
 
 applyVis();syncUI();goView('oblique',true);setT(0);resize();
