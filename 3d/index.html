@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="zh-Hans">
+<html lang="zh-Hant-HK">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>立体眼球调焦模型</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600&display=swap">
+<title>立體眼球調焦模型</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500&family=Noto+Serif+TC:wght@600&display=swap">
 <style>
-/* layout: a dark 3D stage (fixed palette, like a lab viewing box) with overlay pill, view presets and labels; a themed control panel under it (slider, cut mode, layer chips, readouts, causal chain, structure info); then short reading sections. 上课模式 hides the reading text and enlarges the stage. */
+/* layout: a dark 3D stage (fixed palette, like a lab viewing box) with overlay pill, view presets and labels; a themed control panel under it (slider, cut mode, layer chips, readouts, causal chain, structure info); then short reading sections. 上課模式 hides the reading text and enlarges the stage. */
 :root{
   --paper:#F3F6F8;--card:#FFFFFF;--ink:#17202A;--muted:#5A6672;--line:#D5DDE4;
   --muscle:#CF4F3A;--muscle-soft:#F6D3CB;--zonule:#B9800F;--lens-soft:#D6EAF9;--lens-edge:#2E74B0;--post:#1E8C7E;
   --stage:#0C1520;--stage-ink:#E8EEF3;--stage-muted:#97A7B6;--stage-line:rgba(232,238,243,.16);--stage-chip:rgba(12,21,32,.72);
-  --display:"Noto Serif SC","Songti SC","STSong",serif;--body:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;--body:"Noto Sans TC","PingFang HK","PingFang TC","Microsoft JhengHei",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#0F141A;--card:#171E26;--ink:#E5EBF0;--muted:#9AA7B3;--line:#2A3540;
@@ -131,84 +131,85 @@ section{margin-top:40px}
 <body>
 
 <div class="wrap">
-<nav class="crumbs"><a href="https://danny120128.github.io/Bio-page/">← 平面版：睫状肌收缩，悬韧带为什么反而变松？</a></nav>
-<h1>立体眼球：睫状肌怎样让晶状体变凸</h1>
-<p class="lede">这是一个切开了的三维眼球。拖动画面可以转动，双指可以缩放和移动；拖动滑块或者按“自动演示”（也可以按 <kbd>空格</kbd>），看睫状肌收缩时，睫状体、悬韧带和晶状体怎样一起变化。点模型里任何结构或标注，下面会显示说明。</p>
+<nav class="crumbs"><a href="https://danny120128.github.io/Bio-page/">← 平面版：睫狀肌收縮，懸韌帶為什麼反而變鬆？</a></nav>
+<h1>立體眼球：睫狀肌怎樣讓晶狀體變凸</h1>
+<p class="lede">這是一個切開了的三維眼球。拖動畫面可以轉動，雙指可以縮放和移動；拖動滑桿或者按「自動演示」（也可以按 <kbd>空格</kbd>），看睫狀肌收縮時，睫狀體、懸韌帶和晶狀體怎樣一起變化。點模型裏任何結構或標註，下面會顯示說明。</p>
 
 <div class="stage" id="stage">
-  <canvas id="gl" aria-label="可以转动的三维眼球模型"></canvas>
+  <canvas id="gl" aria-label="可以轉動的三維眼球模型"></canvas>
   <svg id="leaders" aria-hidden="true"></svg>
   <div id="labels"></div>
-  <div class="ov tl"><span class="pill" id="pill">看远：睫状肌放松</span></div>
-  <div class="ov tr" id="hint">拖动旋转 · 双指缩放和移动</div>
-  <div class="ov bl" role="group" aria-label="视角">
-    <button class="vbtn" type="button" data-view="oblique" aria-pressed="true">立体剖面</button>
+  <div class="ov tl"><span class="pill" id="pill">看遠：睫狀肌放鬆</span></div>
+  <div class="ov tr" id="hint">拖動旋轉 · 雙指縮放和移動</div>
+  <div class="ov bl" role="group" aria-label="視角">
+    <button class="vbtn" type="button" data-view="oblique" aria-pressed="true">立體剖面</button>
     <button class="vbtn" type="button" data-view="side" aria-pressed="false">正中切面</button>
-    <button class="vbtn" type="button" data-view="front" aria-pressed="false">从前面看一整圈</button>
-    <button class="vbtn" type="button" data-view="zoom" aria-pressed="false">放大睫状体</button>
+    <button class="vbtn" type="button" data-view="front" aria-pressed="false">從前面看一整圈</button>
+    <button class="vbtn" type="button" data-view="zoom" aria-pressed="false">放大睫狀體和懸韌帶</button>
   </div>
-  <div id="nogl" hidden>这台设备的浏览器没有开启三维显示（WebGL），所以模型无法显示。请换用最新版的 Safari 或 Chrome 打开。</div>
+  <div id="nogl" hidden>這部裝置的瀏覽器沒有開啟三維顯示（WebGL），所以模型無法顯示。請換用最新版的 Safari 或 Chrome 打開。</div>
 </div>
 
 <div class="panel">
   <div class="ctrl">
-    <span class="end">看远</span>
-    <input type="range" id="s" min="0" max="1000" step="1" value="0" aria-label="从看远到看近">
+    <span class="end">看遠</span>
+    <input type="range" id="s" min="0" max="1000" step="1" value="0" aria-label="從看遠到看近">
     <span class="end">看近</span>
     <div class="btns">
-      <button id="play" class="btn main" type="button">自动演示</button>
-      <button id="present" class="btn" type="button">上课模式</button>
+      <button id="play" class="btn main" type="button">自動演示</button>
+      <button id="present" class="btn" type="button">上課模式</button>
     </div>
   </div>
 
   <div class="opts">
-    <div><span class="olab">剖开</span>
-      <span class="seg" role="group" aria-label="剖开方式">
-        <button type="button" data-cut="quarter" aria-pressed="true">切掉四分之一</button><button type="button" data-cut="half" aria-pressed="false">切掉一半</button><button type="button" data-cut="full" aria-pressed="false">不切开</button>
+    <div><span class="olab">剖開</span>
+      <span class="seg" role="group" aria-label="剖開方式">
+        <button type="button" data-cut="quarter" aria-pressed="true">切掉四分之一</button><button type="button" data-cut="half" aria-pressed="false">切掉一半</button><button type="button" data-cut="full" aria-pressed="false">不切開</button>
       </span>
     </div>
-    <div class="chips" role="group" aria-label="显示">
-      <button class="chip" type="button" data-opt="lab" aria-pressed="true">标注</button>
-      <button class="chip" type="button" data-opt="ray" aria-pressed="true">光线</button>
-      <button class="chip" type="button" data-opt="ghost" aria-pressed="true">看远时的轮廓</button>
+    <div class="chips" role="group" aria-label="顯示">
+      <button class="chip" type="button" data-opt="lab" aria-pressed="true">標註</button>
+      <button class="chip" type="button" data-opt="ray" aria-pressed="true">光線</button>
+      <button class="chip" type="button" data-opt="ghost" aria-pressed="true">看遠時的輪廓</button>
       <button class="chip" type="button" data-opt="front" aria-pressed="true">角膜和虹膜</button>
-      <button class="chip" type="button" data-opt="sclera" aria-pressed="true">巩膜</button>
-      <button class="chip adv" type="button" data-opt="adv" aria-pressed="false">进阶：后悬韧带</button>
+      <button class="chip" type="button" data-opt="sclera" aria-pressed="true">鞏膜</button>
+      <button class="chip adv" type="button" data-opt="adv" aria-pressed="true">後部懸韌帶</button>
     </div>
   </div>
 
   <div class="legend">
-    <span><i class="sw" style="background:#C6463A"></i>睫状体（睫状肌）</span>
-    <span><i class="sw" style="background:#F2A93B"></i>悬韧带（越亮越紧）</span>
-    <span><i class="sw" style="background:#9CD2FF"></i>晶状体</span>
-    <span><i class="sw" style="background:#5B2421"></i>脉络膜</span>
-    <span><i class="sw" style="background:#C97C66"></i>视网膜</span>
-    <span><i class="sw" style="background:#FFD45C"></i>光线</span>
-    <span id="lg-adv" hidden><i class="sw" style="background:#3FC2AC"></i>后悬韧带</span>
+    <span><i class="sw" style="background:#C6463A"></i>睫狀體（睫狀肌）</span>
+    <span><i class="sw" style="background:#F2A93B"></i>懸韌帶（連晶狀體，越亮越緊）</span>
+    <span><i class="sw" style="background:#9CD2FF"></i>晶狀體</span>
+    <span><i class="sw" style="background:#5B2421"></i>脈絡膜</span>
+    <span><i class="sw" style="background:#C97C66"></i>視網膜</span>
+    <span><i class="sw" style="background:#FFD45C"></i>光線</span>
+    <span id="lg-adv"><i class="sw" style="background:#55D16E"></i>後部懸韌帶（越亮越緊）</span>
   </div>
 
   <div class="read">
-    <div class="r"><p class="k">睫状肌</p><p class="v" id="o1">放松</p></div>
-    <div class="r"><p class="k">悬韧带</p><p class="v" id="o2">拉紧</p></div>
-    <div class="r"><p class="k">晶状体</p><p class="v" id="o3">扁、薄</p></div>
-    <div class="r"><p class="k">瞳孔</p><p class="v" id="o4">较大</p></div>
-    <div class="r"><p class="k">调节力</p><p class="v" id="o5">0.0 D</p></div>
-    <div class="r"><p class="k">看得清的距离</p><p class="v" id="o6">远处</p></div>
+    <div class="r"><p class="k">睫狀肌</p><p class="v" id="o1">放鬆</p></div>
+    <div class="r"><p class="k">懸韌帶（連晶狀體）</p><p class="v" id="o2">拉緊</p></div>
+    <div class="r"><p class="k">後部懸韌帶</p><p class="v" id="o7">放鬆</p></div>
+    <div class="r"><p class="k">晶狀體</p><p class="v" id="o3">扁、薄</p></div>
+    <div class="r"><p class="k">瞳孔</p><p class="v" id="o4">較大</p></div>
+    <div class="r"><p class="k">調節力</p><p class="v" id="o5">0.0 D</p></div>
+    <div class="r"><p class="k">看得清的距離</p><p class="v" id="o6">遠處</p></div>
   </div>
-  <p class="note">调节力按年轻人最大约 10 屈光度（D）估算，青少年通常更大一些。为了看得清楚，模型里的形状变化放大了大约两到三倍。</p>
+  <p class="note">調節力按年輕人最大約 10 屈光度（D）估算，青少年通常更大一些。為了看得清楚，模型裏的形狀變化放大了大約兩到三倍。</p>
 
   <div class="lower">
     <ol class="chain" id="chain">
-      <li data-a="睫状肌舒张，不再出力" data-b="睫状肌收缩，睫状体向前、向内移"></li>
-      <li data-a="脉络膜的弹性把睫状体拉回后外方，环变大" data-b="睫状体围成的环变小，离晶状体更近"></li>
-      <li data-a="悬韧带两端离远，被拉紧" data-b="悬韧带两端靠近，变弯、变松"></li>
-      <li data-a="晶状体被拉扁，折光能力变弱，看清远处" data-b="晶状体靠自身弹性变凸，折光能力变强，看清近处"></li>
+      <li data-a="睫狀肌舒張，不再出力" data-b="睫狀肌收縮，睫狀體向前、向內移"></li>
+      <li data-a="脈絡膜的彈性把睫狀體拉回後外方，環變大" data-b="睫狀體圍成的環變小，離晶狀體更近"></li>
+      <li data-a="懸韌帶兩端離遠，被拉緊；後部懸韌帶放鬆" data-b="懸韌帶兩端靠近，變彎、變鬆；後部懸韌帶被拉緊"></li>
+      <li data-a="晶狀體被拉扁，折光能力變弱，看清遠處" data-b="晶狀體靠自身彈性變凸，折光能力變強，看清近處"></li>
     </ol>
     <aside class="info" id="info" aria-live="polite">
-      <p class="k">结构说明</p>
-      <span class="tag" id="itag" hidden>研究模型，课本不要求</span>
-      <h3 id="iname">点一下模型里的结构</h3>
-      <p id="itext">也可以点画面里的标注。选中的结构会在模型里变亮。</p>
+      <p class="k">結構說明</p>
+      <span class="tag" id="itag" hidden>課本沒有提及</span>
+      <h3 id="iname">點一下模型裏的結構</h3>
+      <p id="itext">也可以點畫面裏的標註。選中的結構會在模型裏變亮。</p>
       <p class="now" id="inow" hidden></p>
     </aside>
   </div>
@@ -216,40 +217,40 @@ section{margin-top:40px}
 
 <section class="two">
   <div>
-    <h2>建议这样看</h2>
+    <h2>建議這樣看</h2>
     <ol class="tips">
-      <li>按 <b>从前面看一整圈</b>，再按自动演示。睫状体是套在晶状体外面的一个环，收缩时整圈往里收，虚线是看远时环和晶状体的位置。</li>
-      <li>按 <b>放大睫状体</b>，盯着悬韧带看：看远时它们是直的、亮的；看近时变弯、变暗，因为两端靠近了。</li>
-      <li>按 <b>正中切面</b>，打开光线。看远和看近时，光线都要聚到视网膜上，看近时晶状体必须更凸。</li>
-      <li>点一下脉络膜。睫状肌放松以后，是它的弹性把睫状体拉回去，悬韧带才重新被拉紧。</li>
+      <li>按 <b>從前面看一整圈</b>，再按自動演示。睫狀體是套在晶狀體外面的一個環，收縮時整圈往裏收，虛線是看遠時環和晶狀體的位置。</li>
+      <li>按 <b>放大睫狀體和懸韌帶</b>，盯著懸韌帶看：看遠時連晶狀體的懸韌帶是直的、亮的，後部的綠色纖維較暗；看近時正好反過來。</li>
+      <li>按 <b>正中切面</b>，打開光線。看遠和看近時，光線都要聚到視網膜上，看近時晶狀體必須更凸。</li>
+      <li>點一下脈絡膜和後部懸韌帶（綠色）。睫狀肌收縮時它們被往前拉緊；睫狀肌放鬆以後，脈絡膜的彈性把睫狀體拉回去，連晶狀體的懸韌帶才重新被拉緊。</li>
     </ol>
   </div>
   <div>
-    <h2>课本要记住的</h2>
+    <h2>課本要記住的</h2>
     <div class="sums">
-      <div class="sum near"><b>看近</b><span>睫状肌收缩</span><i>→</i><span>悬韧带放松</span><i>→</i><span>晶状体变凸</span><i>→</i><span>折光能力变强</span></div>
-      <div class="sum far"><b>看远</b><span>睫状肌舒张</span><i>→</i><span>悬韧带拉紧</span><i>→</i><span>晶状体变扁</span><i>→</i><span>折光能力变弱</span></div>
+      <div class="sum near"><b>看近</b><span>睫狀肌收縮</span><i>→</i><span>懸韌帶放鬆</span><i>→</i><span>晶狀體變凸</span><i>→</i><span>折光能力變強</span></div>
+      <div class="sum far"><b>看遠</b><span>睫狀肌舒張</span><i>→</i><span>懸韌帶拉緊</span><i>→</i><span>晶狀體變扁</span><i>→</i><span>折光能力變弱</span></div>
     </div>
-    <p style="margin-top:14px">看近时瞳孔还会同时缩小，这和调节一起，属于近反射。</p>
+    <p style="margin-top:14px">看近時瞳孔還會同時縮小，這和調節一起，屬於近反射。</p>
   </div>
 </section>
 
 <section class="two">
   <div class="adv-box">
-    <span class="tag">进阶内容</span>
-    <h2>视频里的“前后悬韧带此消彼长”</h2>
-    <p>老师看过的那段三维动画，出自 Goldberg 在 2011 年发表的研究。他除了画出连到晶状体的悬韧带，还画出另一组从睫状体后部连到锯齿缘附近脉络膜、以及连到玻璃体前界膜的纤维，称为后悬韧带。</p>
-    <p>他认为两组纤维互相配合：睫状肌收缩时，前悬韧带变松，后悬韧带被拉紧；睫状肌放松时反过来，后悬韧带储存的弹性帮助眼睛回到看远的状态。打开“进阶：后悬韧带”就能看到这一组纤维的松紧变化。</p>
-    <p>这是研究者提出、仍需验证的理论模型。中学阶段只需要掌握上面的课本结论。</p>
-    <p class="src">来源：Goldberg DB. Computer-animated model of accommodation and theory of reciprocal zonular action. <i>Clinical Ophthalmology</i>, 2011. <a href="https://doaj.org/article/f3c4682f96924196aca95e25aba7d5c6">查看论文</a></p>
+    <span class="tag">延伸內容</span>
+    <h2>綠色的後部懸韌帶是什麼？</h2>
+    <p>課本裏的懸韌帶，指的是連接睫狀體和晶狀體的那些纖維。其實懸韌帶系統還有往後延伸的部分：一組從睫狀突後方沿著睫狀體平坦部，一直連到視網膜前緣（鋸齒緣）附近；另一組連到包住玻璃體的玻璃體前界膜。Lütjen-Drecoll 等人在 2010 年用電子顯微鏡，在人的眼睛和猴子的眼睛裏都觀察到這些結構。</p>
+    <p>睫狀肌收縮時，睫狀體向前、向內移，這些後部纖維被往前拉緊，連到晶狀體的懸韌帶則變鬆；睫狀肌放鬆時反過來。老師看過的那段立體動畫（Goldberg，2011）就是根據這些解剖和超聲波研究畫成的，稱為前後懸韌帶此消彼長。後部纖維具體怎樣分擔力量，學界仍在研究。</p>
+    <p>中學階段只需要掌握上面的課本結論。不想顯示時，可以關掉「後部懸韌帶」。</p>
+    <p class="src">來源：Lütjen-Drecoll E 等. Morphology and accommodative function of the vitreous zonule in human and monkey eyes. <i>Investigative Ophthalmology &amp; Visual Science</i>, 2010. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2829378">查看論文</a><br>Goldberg DB. Computer-animated model of accommodation and theory of reciprocal zonular action. <i>Clinical Ophthalmology</i>, 2011. <a href="https://doaj.org/article/f3c4682f96924196aca95e25aba7d5c6">查看論文</a></p>
   </div>
   <div>
-    <h2>这个模型做了哪些简化</h2>
+    <h2>這個模型做了哪些簡化</h2>
     <ol class="tips">
-      <li>大小按真实眼球大致比例（眼轴约 25 毫米），但晶状体厚度、睫状体移动和悬韧带弯曲都放大了，真实的变化只有零点几毫米。</li>
-      <li>睫状体内侧画了 72 条睫状突，真实的眼睛大约有 70 到 80 条。</li>
-      <li>光线只画成在角膜和晶状体各转折一次，实际上光在每个界面都会折射，角膜负责大部分折光。</li>
-      <li>悬韧带实际是成千上万条细纤维，这里每条睫状突之间只画三条代表。</li>
+      <li>大小按真實眼球大致比例（眼軸約 25 毫米），但晶狀體厚度、睫狀體移動和懸韌帶彎曲都放大了，真實的變化只有零點幾毫米。</li>
+      <li>睫狀體內側畫了 72 條睫狀突，真實的眼睛大約有 70 到 80 條。</li>
+      <li>光線只畫成在角膜和晶狀體各轉折一次，實際上光在每個界面都會折射，角膜負責大部分折光。</li>
+      <li>懸韌帶實際是成千上萬條細纖維，這裏每兩條睫狀突之間只畫五條連晶狀體的纖維作代表，後部懸韌帶也只畫了一部分。</li>
     </ol>
   </div>
 </section>
@@ -371,7 +372,7 @@ const HL={cornea:[MAT.cornea],iris:[MAT.iris,MAT.irisCap],lens:[MAT.lens,MAT.len
   choroid:[MAT.choroid,MAT.choroidCap],retina:[MAT.retina,MAT.retinaCap],ppz:[MAT.post],hyaloid:[MAT.hyal],ray:[]};
 
 /* ---------- state ---------- */
-const st={t:0,cut:'quarter',lab:true,ray:true,ghost:true,front:true,sclera:true,adv:false,sel:null};
+const st={t:0,cut:'quarter',lab:true,ray:true,ghost:true,front:true,sclera:true,adv:true,sel:null};
 const CUT=()=>st.cut==='full'?[0,TAU]:st.cut==='half'?[UP,Math.PI]:[UP,Math.PI*1.5];
 const NPROC=72,bump=f=>0.32*(0.5+0.5*Math.cos(NPROC*f));
 
@@ -425,7 +426,7 @@ function solid(k,mat,capMat){const G=new THREE.Group();G.userData.key=k;eye.add(
 const SO={sclera:solid('sclera',MAT.sclera,MAT.scleraCap),cornea:solid('cornea',MAT.cornea,MAT.cornea),choroid:solid('choroid',MAT.choroid,MAT.choroidCap),
   retina:solid('retina',MAT.retina,MAT.retinaCap),ciliary:solid('ciliary',MAT.cil,MAT.cilCap),lens:solid('lens',MAT.lens,MAT.lensCap),iris:solid('iris',MAT.iris,MAT.irisCap)};
 SO.cornea.G.renderOrder=3;SO.lens.G.renderOrder=2;
-const ZT=new Tubes(MAT.zon,5,14);ZT.mesh.userData.key='zonule';grp.zonule=new THREE.Group();grp.zonule.add(ZT.mesh);eye.add(grp.zonule);
+const ZT=new Tubes(MAT.zon,5,14);/* ZT.M must match the point count passed to fiberPath */ZT.mesh.userData.key='zonule';grp.zonule=new THREE.Group();grp.zonule.add(ZT.mesh);eye.add(grp.zonule);
 const PT=new Tubes(MAT.post,5,18);PT.mesh.userData.key='ppz';grp.ppz=new THREE.Group();grp.ppz.add(PT.mesh);eye.add(grp.ppz);
 const RT=new Tubes(MAT.ray,5,30);RT.mesh.userData.key='ray';grp.ray=new THREE.Group();grp.ray.add(RT.mesh);eye.add(grp.ray);
 const objDot=new THREE.Mesh(new THREE.SphereGeometry(0.42,20,14),MAT.obj);grp.ray.add(objDot);
@@ -443,11 +444,13 @@ let G0=geom(0),G1=geom(1),G=G0,cutDirty=true;
 /* zonule fans: origins ordered front-to-back along the ciliary processes, insertions ordered the same way on the lens, so fibres never cross */
 const ZDEF=[{o:g=>mix(g.A,g.a2,.8),th:62,ph:-1,c:0},{o:g=>mix(g.A,g.a2,.45),th:74,ph:-1,c:0},{o:g=>g.A,th:90,ph:1,c:1},{o:g=>mix(g.A,g.pl1,.3),th:106,ph:1,c:2},{o:g=>mix(g.A,g.pl1,.45),th:115,ph:1,c:2}];
 function mix(a,b,u){return [lerp(a[0],b[0],u),lerp(a[1],b[1],u)];}
-const PPZ={o:g=>mix(g.pl1,g.PP2,.5),e:[onR(10.95,5.35)[0]-0.1,5.35]};
+/* posterior zonular system (Lütjen-Drecoll 2010): pars plana zonule from the zonular plexus behind the processes back to the insertion zone near the ora serrata (anchored in the elastic choroid, moves forward a little), and the intermediate vitreous zonule from the posterior pars plicata to the anterior vitreous membrane near the ora. Both are taut when the muscle contracts. */
+const PPZ={o:g=>mix(g.pl1,g.PP2,.2),e:g=>{const y=5.35+0.16*g.t;return [onR(10.95,y)[0]-0.1,y];}};
+const IVZ={o:g=>g.pl1,e:g=>{const h=hyaloidSeg(g)[3];return [h[0],h[1]];}};
 const dist2=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 ZDEF.forEach(z=>{z.L=dist2(z.o(G0),lensPt(G0,z.th*Math.PI/180));});
-PPZ.L=dist2(PPZ.o(G1),PPZ.e);
-const ZTAUT=[[0.97,0.79,0.42],[0.949,0.663,0.231],[0.88,0.53,0.16]],ZSLACK=[[0.46,0.42,0.34],[0.42,0.37,0.30],[0.39,0.32,0.25]],PTAUT=[0.25,0.78,0.68],PSLACK=[0.22,0.36,0.34];
+PPZ.L=dist2(PPZ.o(G1),PPZ.e(G1));IVZ.L=dist2(IVZ.o(G1),IVZ.e(G1));
+const ZTAUT=[[0.97,0.79,0.42],[0.949,0.663,0.231],[0.88,0.53,0.16]],ZSLACK=[[0.46,0.42,0.34],[0.42,0.37,0.30],[0.39,0.32,0.25]],PTAUT=[0.33,0.82,0.43],PSLACK=[0.25,0.38,0.28],VTAUT=[0.62,0.87,0.36],VSLACK=[0.32,0.38,0.24];
 function fiberPath(S,E,L,n,ph,f,M){
   const d=S.distanceTo(E),ex=Math.max(0,L-d),h=ex>0?0.6*(2/(Math.PI*n))*Math.sqrt(d*ex):0;
   const ephi=new V3(Math.cos(f),0,-Math.sin(f)),v=new V3().subVectors(E,S),dir=new V3().crossVectors(v,ephi).normalize();
@@ -479,11 +482,12 @@ function updateGeo(){
   setSolid(SO.ciliary,ciliarySegs(g),NPROC*6,bump);setSolid(SO.lens,lensSegs(g),96);setSolid(SO.iris,irisSegs(g),128);
   const vs=valleys(),paths=[];
   vs.forEach((f,vi)=>ZDEF.forEach((z,zi)=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);
-    const fp=fiberPath(P(o[0],o[1],f),P(e[0],e[1],f),z.L,1,z.ph,f,14);
+    const fp=fiberPath(P(o[0],o[1],f),P(e[0],e[1],f),z.L,1,z.ph,f,ZT.M);
     fp.c=colMix(ZSLACK[z.c],ZTAUT[z.c],clamp((fp.tension-0.86)/0.14,0,1));paths.push(fp);}));
   ZT.set(paths,0.034);
-  if(st.adv){const pp=[];vs.forEach((f,vi)=>{if(vi%3&&vs.length>3)return;const o=PPZ.o(g);
-      const fp=fiberPath(P(o[0],o[1],f),P(PPZ.e[0],PPZ.e[1],f),PPZ.L,1,-1,f,18);fp.c=colMix(PSLACK,PTAUT,clamp((fp.tension-0.86)/0.14,0,1));pp.push(fp);});
+  if(st.adv){const pp=[];vs.forEach((f,vi)=>{if(vi%3&&vs.length>3)return;
+      [[PPZ,PSLACK,PTAUT],[IVZ,VSLACK,VTAUT]].forEach(([Z,cs,ct])=>{const o=Z.o(g),e=Z.e(g);
+        const fp=fiberPath(P(o[0],o[1],f),P(e[0],e[1],f),Z.L,1,-1,f,PT.M);fp.c=colMix(cs,ct,clamp((fp.tension-0.86)/0.14,0,1));pp.push(fp);});});
     PT.set(pp,0.04);
     const hs=hyaloidSeg(g);HY.set([hs],f0,fl,Math.max(8,Math.ceil(96*fl/TAU)),null);
     const ca=capAngles();hyLines.forEach((l,i)=>{l.visible=!!ca[i];if(ca[i]){l.geometry.dispose();l.geometry=new THREE.BufferGeometry().setFromPoints(hs.map(p=>P(p[0],p[1],ca[i][0])));}});}
@@ -530,7 +534,7 @@ const VIEWS={
   oblique:{cut:'quarter',front:true,sclera:true,ray:true,target:[-4.5,0,0],th:-0.55,ph:1.08,r:50},
   side:{cut:'half',front:true,sclera:true,ray:true,target:[-3,0,0],th:0,ph:Math.PI/2,r:56},
   front:{cut:'full',front:false,sclera:false,ray:false,target:[-7,0,0],th:-Math.PI/2,ph:Math.PI/2,r:44},
-  zoom:{cut:'half',front:true,sclera:true,ray:false,target:[-8.25,5.5,0],th:0.12,ph:1.42,r:14.5}
+  zoom:{cut:'half',front:true,sclera:true,ray:false,target:[-7.7,6.4,0],th:0.12,ph:1.42,r:16.5}
 };
 let tween=null;
 function goView(name,instant){const v=VIEWS[name];occStale=true;st.cut=v.cut;st.front=v.front;st.sclera=v.sclera;st.ray=v.ray;geoDirty=true;cutDirty=true;syncUI();applyVis();
@@ -566,7 +570,7 @@ canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercanc
 canvas.addEventListener('wheel',e=>{e.preventDefault();cam.r=clamp(cam.r*Math.exp(e.deltaY*0.0012),8,120);tween=null;clearViewPressed();camMoved=true;req();},{passive:false});
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 stageEl.addEventListener('gesturestart',e=>e.preventDefault());
-if(matchMedia('(pointer: fine)').matches)$('hint').textContent='拖动旋转 · 滚轮缩放 · 右键拖动平移';
+if(matchMedia('(pointer: fine)').matches)$('hint').textContent='拖動旋轉 · 滾輪縮放 · 右鍵拖動平移';
 
 const ray=new THREE.Raycaster();
 function visibleMesh(o){for(let x=o;x;x=x.parent)if(!x.visible)return false;return true;}
@@ -580,16 +584,16 @@ function pick(cx,cy){const r=canvas.getBoundingClientRect();const v=new THREE.Ve
 const LB=[
   {k:'cornea',t:'角膜',f:g=>P(3.4,5.28+Math.sqrt(60.84-11.56),UP)},
   {k:'iris',t:'虹膜',f:g=>{const r=lerp(g.p,IRB[0],.5);return P(r,irisBackY(g,r)+0.2,DN);}},
-  {k:'lens',t:'晶状体',f:g=>P(1.7,g.yc,DN)},
-  {k:'ciliary',t:'睫状体',f:g=>{const r=(g.A[0]+onR(11.5,g.A[1])[0])/2;return P(r,g.A[1]-0.25,UP);}},
-  {k:'zonule',t:'悬韧带',f:g=>{const f=UP+Math.PI/NPROC,e=lensPt(g,Math.PI/2);return P((g.A[0]+e[0])/2,(g.A[1]+e[1])/2,f);}},
-  {k:'sclera',t:'巩膜',f:g=>Ps(11.8,1.5,UP)},
-  {k:'choroid',t:'脉络膜',f:g=>Ps(11.33,-5,UP)},
-  {k:'retina',t:'视网膜',f:g=>Ps(11.05,-7.5,DN)},
-  {k:'vitreous',t:'玻璃体',f:g=>P(3.6,-1,UP),when:()=>st.cut!=='full'},
-  {k:'ray',t:'光线',f:g=>{const hc=g.p*0.8*0.9/lerp(0.88,0.97,g.t),yC=5.28+Math.sqrt(60.84-hc*hc),u=(26-19)/(26-yC);return P(hc*(1-g.t)+u*hc*g.t,19,UP);},when:()=>st.ray},
-  {k:'ppz',t:'后悬韧带',f:g=>{const o=PPZ.o(g),f=valleys()[0]||UP;return P((o[0]+PPZ.e[0])/2,(o[1]+PPZ.e[1])/2,f);},when:()=>st.adv},
-  {k:'hyaloid',t:'玻璃体前界膜',f:g=>{const h=hyaloidSeg(g)[9];return P(h[0],h[1],DN);},when:()=>st.adv}
+  {k:'lens',t:'晶狀體',f:g=>P(1.7,g.yc,DN)},
+  {k:'ciliary',t:'睫狀體',f:g=>{const r=(g.A[0]+onR(11.5,g.A[1])[0])/2;return P(r,g.A[1]-0.25,UP);}},
+  {k:'zonule',t:'懸韌帶',f:g=>{const f=UP+Math.PI/NPROC,e=lensPt(g,Math.PI/2);return P((g.A[0]+e[0])/2,(g.A[1]+e[1])/2,f);}},
+  {k:'sclera',t:'鞏膜',f:g=>Ps(11.8,1.5,UP)},
+  {k:'choroid',t:'脈絡膜',f:g=>Ps(11.33,-5,UP)},
+  {k:'retina',t:'視網膜',f:g=>Ps(11.05,-7.5,DN)},
+  {k:'vitreous',t:'玻璃體',f:g=>P(3.6,-1,UP),when:()=>st.cut!=='full'},
+  {k:'ray',t:'光線',f:g=>{const hc=g.p*0.8*0.9/lerp(0.88,0.97,g.t),yC=5.28+Math.sqrt(60.84-hc*hc),u=(26-19)/(26-yC);return P(hc*(1-g.t)+u*hc*g.t,19,UP);},when:()=>st.ray},
+  {k:'ppz',t:'後部懸韌帶',f:g=>{const o=PPZ.o(g),e=PPZ.e(g),f=valleys()[0]||UP;return P((o[0]+e[0])/2,(o[1]+e[1])/2,f);},when:()=>st.adv},
+  {k:'hyaloid',t:'玻璃體前界膜',f:g=>{const h=hyaloidSeg(g)[9];return P(h[0],h[1],DN);},when:()=>st.adv}
 ];
 const OWN={cornea:'cornea',iris:'iris',lens:'lens',ciliary:'ciliary',zonule:'zonule',sclera:'sclera',choroid:'choroid',retina:'retina',vitreous:null,ray:'ray',ppz:'ppz',hyaloid:'hyaloid'};
 const labelsEl=$('labels'),leaders=$('leaders');
@@ -599,7 +603,6 @@ let labelsDirty=true,occStale=true,idleT=0,occCache={};
 function occluders(){const o=[];['sclera','iris','choroid','retina','ciliary'].forEach(k=>{if(visibleMesh(grp[k]))grp[k].traverse(m=>{if(m.isMesh&&m.visible)o.push(m);});});return o;}
 function updateLabels(force){
   const w=stageEl.clientWidth,h=stageEl.clientHeight;
-  LB.find(l=>l.k==='zonule').el.textContent=st.adv?'前悬韧带':'悬韧带';
   const doOcc=!!force;const occ=doOcc?occluders():null;
   const c0=eye.localToWorld(new V3(0,5,0)).project(camera),cx=(c0.x+1)/2*w,cy=(1-c0.y)/2*h;
   const items=[];
@@ -628,61 +631,62 @@ function updateLabels(force){
 
 /* ---------- info panel ---------- */
 const INFO={
-  ciliary:{n:'睫状体（里面是睫状肌）',x:'一圈环形的结构，围在晶状体外面，贴在巩膜内侧，里面有睫状肌。它的内侧有大约 70 到 80 条皱褶，叫睫状突，悬韧带就从这里伸向晶状体。',
-    now:g=>g.t>=0.5?'睫状肌正在收缩：整圈向前、向内移，围成的环变小，离晶状体更近。':'睫状肌放松：环被脉络膜的弹性拉回后外方，环比较大。'},
-  zonule:{n:'悬韧带（睫状小带）',x:'很多条很细的纤维，一端连着睫状体，一端连着晶状体的边缘，把晶状体吊在中间。悬韧带自己不会收缩，它松还是紧，取决于两端离得多远。',
-    now:g=>g.t>=0.5?'两端靠近了，纤维变弯、颜色变暗，对晶状体的拉力变小。':'两端离得远，纤维被拉直、颜色发亮，把晶状体四周往外拉。'},
-  lens:{n:'晶状体',x:'透明、有弹性的双凸结构，外面包着一层有弹性的囊膜。没有外力拉它时，它会自己变得比较圆。',
-    now:g=>g.t>=0.5?'四周的拉力变小，晶状体靠自身弹性变厚、变凸，折光能力变强。':'被悬韧带往四周拉，变扁变薄，折光能力变弱。'},
-  iris:{n:'虹膜',x:'眼睛有颜色的部分，中间的孔就是瞳孔。看近时瞳孔会跟着缩小，这是近反射的一部分，可以让看近处时更清楚。',
-    now:g=>g.t>=0.5?'看近：瞳孔缩小。':'看远：瞳孔比较大。'},
-  cornea:{n:'角膜',x:'眼球最前面透明的一层，负责大部分的折光。它的形状不会改变，所以看远看近的调节要靠晶状体。'},
-  sclera:{n:'巩膜',x:'眼球白色、坚韧的外壳，保护眼球、维持形状。睫状体贴在它的内侧。'},
-  choroid:{n:'脉络膜',x:'巩膜内侧颜色很深、血管丰富的一层。它有弹性，向前连着睫状体。睫状肌收缩时把它往前拉；睫状肌一放松，它的弹性就把睫状体拉回原位，悬韧带又被拉紧。',
-    now:g=>g.t>=0.5?'正被睫状肌往前拉，像一条拉长了的弹簧（看黄色小箭头）。':'已经回弹，把睫状体拉回后外方。'},
-  retina:{n:'视网膜',x:'眼球最里面的一层，有感光细胞。光线要准确聚在视网膜上，看到的东西才清楚。它的前缘叫锯齿缘，再往前就是睫状体。'},
-  vitreous:{n:'玻璃体',x:'填满晶状体后面空间的透明胶状物，帮助维持眼球的形状。'},
-  ray:{n:'光线（示意）',x:'黄色线是从物体射进眼睛的光。这里把折射简化成在角膜和晶状体各转折一次。看远时光几乎是平行的；看近时光是散开的，晶状体要更凸，才能把光聚到视网膜上。',
-    now:g=>g.t>0.05?'现在是近处物体射来的光（左边的黄点），光线散开射入。':'现在是远处射来的光，几乎平行射入。'},
-  ppz:{n:'后悬韧带（平坦部悬韧带）',adv:true,x:'Goldberg（2011）描述的另一组纤维：从睫状体后部连到锯齿缘附近的脉络膜。他认为它们和连到晶状体的前悬韧带此消彼长。',
-    now:g=>g.t>=0.5?'睫状肌收缩：前悬韧带变松，这组后悬韧带却被拉紧（颜色发亮），储存弹性。':'睫状肌放松：后悬韧带变松，前悬韧带重新拉紧。'},
-  hyaloid:{n:'玻璃体前界膜',adv:true,x:'包住玻璃体前面的一层薄膜，中间贴近晶状体后面。在 Goldberg 的模型里，后悬韧带会牵拉这层膜，帮助塑造晶状体后表面的弯曲。'}
+  ciliary:{n:'睫狀體（裏面是睫狀肌）',x:'一圈環形的結構，圍在晶狀體外面，貼在鞏膜內側，裏面有睫狀肌。它的內側有大約 70 到 80 條皺褶，叫睫狀突，懸韌帶就從這裏伸向晶狀體。',
+    now:g=>g.t>=0.5?'睫狀肌正在收縮：整圈向前、向內移，圍成的環變小，離晶狀體更近。':'睫狀肌放鬆：環被脈絡膜的彈性拉回後外方，環比較大。'},
+  zonule:{n:'懸韌帶（睫狀小帶）',x:'很多條很細的纖維，從睫狀突之間伸出，連到晶狀體的前表面、邊緣和後表面，分成前後有序的幾組，把晶狀體吊在中間。懸韌帶自己不會收縮，它鬆還是緊，取決於兩端離得多遠。',
+    now:g=>g.t>=0.5?'兩端靠近了，纖維變彎、顏色變暗，對晶狀體的拉力變小。':'兩端離得遠，纖維被拉直、顏色發亮，把晶狀體四周往外拉。'},
+  lens:{n:'晶狀體',x:'透明、有彈性的雙凸結構，外面包著一層有彈性的囊膜。沒有外力拉它時，它會自己變得比較圓。',
+    now:g=>g.t>=0.5?'四周的拉力變小，晶狀體靠自身彈性變厚、變凸，折光能力變強。':'被懸韌帶往四周拉，變扁變薄，折光能力變弱。'},
+  iris:{n:'虹膜',x:'眼睛有顏色的部分，中間的孔就是瞳孔。看近時瞳孔會跟著縮小，這是近反射的一部分，可以讓看近處時更清楚。',
+    now:g=>g.t>=0.5?'看近：瞳孔縮小。':'看遠：瞳孔比較大。'},
+  cornea:{n:'角膜',x:'眼球最前面透明的一層，負責大部分的折光。它的形狀不會改變，所以看遠看近的調節要靠晶狀體。'},
+  sclera:{n:'鞏膜',x:'眼球白色、堅韌的外殼，保護眼球、維持形狀。睫狀體貼在它的內側。'},
+  choroid:{n:'脈絡膜',x:'鞏膜內側顏色很深、血管豐富的一層。它有彈性，向前連著睫狀體。睫狀肌收縮時把它往前拉；睫狀肌一放鬆，它的彈性就把睫狀體拉回原位，懸韌帶又被拉緊。',
+    now:g=>g.t>=0.5?'正被睫狀肌往前拉，像一條拉長了的彈簧（看黃色小箭頭）。':'已經回彈，把睫狀體拉回後外方。'},
+  retina:{n:'視網膜',x:'眼球最裏面的一層，有感光細胞。光線要準確聚在視網膜上，看到的東西才清楚。它的前緣叫鋸齒緣，再往前就是睫狀體。'},
+  vitreous:{n:'玻璃體',x:'填滿晶狀體後面空間的透明膠狀物，幫助維持眼球的形狀。'},
+  ray:{n:'光線（示意）',x:'黃色線是從物體射進眼睛的光。這裏把折射簡化成在角膜和晶狀體各轉折一次。看遠時光幾乎是平行的；看近時光是散開的，晶狀體要更凸，才能把光聚到視網膜上。',
+    now:g=>g.t>0.05?'現在是近處物體射來的光（左邊的黃點），光線散開射入。':'現在是遠處射來的光，幾乎平行射入。'},
+  ppz:{n:'後部懸韌帶',adv:true,x:'懸韌帶系統往後延伸的部分：深綠色的一組從睫狀突後方沿著睫狀體平坦部，連到鋸齒緣附近；淺綠色的一組連到玻璃體前界膜。人眼裏有這些結構，是用電子顯微鏡觀察到的（Lütjen-Drecoll 等，2010）。',
+    now:g=>g.t>=0.5?'睫狀肌收縮：連晶狀體的懸韌帶變鬆，後部懸韌帶卻被往前拉緊（顏色發亮）。':'睫狀肌放鬆：後部懸韌帶變鬆，連晶狀體的懸韌帶重新拉緊。'},
+  hyaloid:{n:'玻璃體前界膜',adv:true,x:'包住玻璃體前面的一層透明薄膜，邊緣牢牢連在鋸齒緣附近，中間貼近晶狀體後面。淺綠色的後部懸韌帶連在它上面，看近時會牽拉它。'}
 };
 function select(k){st.sel=k;
   Object.keys(HL).forEach(n=>HL[n].forEach(m=>{if(m.emissive)m.emissive.setHex(n===k?0x3a3226:0x000000);}));
   MAT.ray.color.setHex(k==='ray'?0xFFF0B0:0xFFD45C);
   renderInfo();labelsDirty=true;req();}
 function renderInfo(){const k=st.sel,I=k&&INFO[k];
-  if(!I){$('iname').textContent='点一下模型里的结构';$('itext').textContent='也可以点画面里的标注。选中的结构会在模型里变亮。';$('inow').hidden=true;$('itag').hidden=true;return;}
-  $('iname').textContent=k==='zonule'&&st.adv?'前悬韧带（连到晶状体的悬韧带）':I.n;$('itext').textContent=I.x;$('itag').hidden=!I.adv;
-  if(I.now){$('inow').hidden=false;$('inow').textContent='现在：'+I.now(geom(st.t));}else $('inow').hidden=true;}
+  if(!I){$('iname').textContent='點一下模型裏的結構';$('itext').textContent='也可以點畫面裏的標註。選中的結構會在模型裏變亮。';$('inow').hidden=true;$('itag').hidden=true;return;}
+  $('iname').textContent=I.n;$('itext').textContent=I.x;$('itag').hidden=!I.adv;
+  if(I.now){$('inow').hidden=false;$('inow').textContent='現在：'+I.now(geom(st.t));}else $('inow').hidden=true;}
 
 /* ---------- readouts, chain, slider, autoplay ---------- */
 const S=$('s'),pill=$('pill');
 function setT(t,dir){st.t=t;geoDirty=true;tMoved=true;
-  $('o1').textContent=t<0.1?'放松':t<0.6?'开始收缩':'收缩';
-  $('o2').textContent=t<0.1?'拉紧':t<0.6?'开始变松':'松弛';
-  $('o3').textContent=t<0.1?'扁、薄':t<0.6?'开始变凸':'厚、凸';
-  $('o4').textContent=t<0.1?'较大':t<0.6?'开始缩小':'缩小';
+  $('o1').textContent=t<0.1?'放鬆':t<0.6?'開始收縮':'收縮';
+  $('o2').textContent=t<0.1?'拉緊':t<0.6?'開始變鬆':'鬆弛';
+  $('o7').textContent=t<0.1?'放鬆':t<0.6?'開始拉緊':'拉緊';
+  $('o3').textContent=t<0.1?'扁、薄':t<0.6?'開始變凸':'厚、凸';
+  $('o4').textContent=t<0.1?'較大':t<0.6?'開始縮小':'縮小';
   const D=10*t;$('o5').textContent=D.toFixed(1)+' D';
-  $('o6').textContent=D<0.05?'远处':(100/D>=100?(1/D).toFixed(1)+' 米':Math.round(100/D)+' 厘米');
+  $('o6').textContent=D<0.05?'遠處':(100/D>=100?(1/D).toFixed(1)+' 米':Math.round(100/D)+' 厘米');
   const near=dir?dir==='near':t>=0.5,x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
   document.querySelectorAll('#chain li').forEach((li,i)=>{li.textContent=near?li.dataset.b:li.dataset.a;li.classList.toggle('on',near&&x>=thr[i]);li.classList.toggle('on-far',!near&&x>=thr[i]);});
-  const pn=t>=0.5;pill.classList.toggle('near',pn);pill.textContent=pn?'看近：睫状肌收缩':'看远：睫状肌放松';
-  if(st.sel&&INFO[st.sel]&&INFO[st.sel].now)$('inow').textContent='现在：'+INFO[st.sel].now(geom(t));
+  const pn=t>=0.5;pill.classList.toggle('near',pn);pill.textContent=pn?'看近：睫狀肌收縮':'看遠：睫狀肌放鬆';
+  if(st.sel&&INFO[st.sel]&&INFO[st.sel].now)$('inow').textContent='現在：'+INFO[st.sel].now(geom(t));
   req();}
 let geoDirty=true,tMoved=false;
 S.addEventListener('input',()=>{stop();setT(S.value/1000);});
 let playing=false,p0=0;const btn=$('play');
 const PH=[3500,4500,5500,4500],TOT=18000;
-function stop(){if(playing){playing=false;btn.textContent='自动演示';req();}}
-function toggle(){if(playing)stop();else{playing=true;p0=0;btn.textContent='暂停';req();}}
+function stop(){if(playing){playing=false;btn.textContent='自動演示';req();}}
+function toggle(){if(playing)stop();else{playing=true;p0=0;btn.textContent='暫停';req();}}
 function playStep(now){if(!p0)p0=now;let m=(now-p0)%TOT,v,dir;
   if(m<PH[0]){v=0;dir='far';}else if((m-=PH[0])<PH[1]){v=m/PH[1];dir='near';}else if((m-=PH[1])<PH[2]){v=1;dir='near';}else{m-=PH[2];v=1-m/PH[3];dir='far';}
   const e=v<0.5?2*v*v:1-Math.pow(-2*v+2,2)/2;S.value=Math.round(e*1000);setT(e,dir);}
 btn.addEventListener('click',toggle);
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['BUTTON','INPUT'].includes(e.target.tagName)){e.preventDefault();toggle();}});
-$('present').addEventListener('click',e=>{const on=document.body.classList.toggle('present');e.currentTarget.textContent=on?'退出上课模式':'上课模式';e.currentTarget.blur();window.scrollTo(0,0);});
+$('present').addEventListener('click',e=>{const on=document.body.classList.toggle('present');e.currentTarget.textContent=on?'退出上課模式':'上課模式';e.currentTarget.blur();window.scrollTo(0,0);});
 
 function syncUI(){document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===st.cut?'true':'false'));
   document.querySelectorAll('[data-opt]').forEach(b=>b.setAttribute('aria-pressed',st[b.dataset.opt]?'true':'false'));}
@@ -711,7 +715,7 @@ function frame(now){pending=false;
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();stop();});
 
 /* hooks for checking the model's geometry */
-window.__eye={ug:()=>{const t0=performance.now();updateGeo();return performance.now()-t0;},occ:()=>{const t0=performance.now();updateLabels(true);return performance.now()-t0;},geom,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,fib2d:t=>{const g=geom(t);return ZDEF.map(z=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),z.L,1,z.ph,UP,40).pts.map(v=>[v.x,v.y]);});},setT:t=>{S.value=Math.round(t*1000);setT(t);},view:n=>goView(n,true),set:(k,v)=>{st[k]=v;if(k==='cut')cutDirty=true;geoDirty=true;syncUI();applyVis();req();},select,st,
+window.__eye={ug:()=>{const t0=performance.now();updateGeo();return performance.now()-t0;},occ:()=>{const t0=performance.now();updateLabels(true);return performance.now()-t0;},geom,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,post2d:t=>{const g=geom(t);return [PPZ,IVZ].map(Z=>{const o=Z.o(g),e=Z.e(g);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),Z.L,1,-1,UP,40).pts.map(v=>[v.x,v.y]);});},hy2d:t=>hyaloidSeg(geom(t)),fib2d:t=>{const g=geom(t);return ZDEF.map(z=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),z.L,1,z.ph,UP,40).pts.map(v=>[v.x,v.y]);});},setT:t=>{S.value=Math.round(t*1000);setT(t);},view:n=>goView(n,true),set:(k,v)=>{st[k]=v;if(k==='cut')cutDirty=true;geoDirty=true;syncUI();applyVis();req();},select,st,
   frame:()=>{if(geoDirty||cutDirty){updateGeo();geoDirty=false;}placeCam();renderer.render(scene,camera);updateLabels(true);}};
 
 applyVis();syncUI();goView('oblique',true);setT(0);resize();
