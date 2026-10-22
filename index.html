@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="zh-Hans">
+<html lang="zh-Hant-HK">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>睫状肌怎样调焦</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600&display=swap">
+<title>睫狀肌怎樣調焦</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500&family=Noto+Serif+TC:wght@600&display=swap">
 <style>
-/* layout: one wide stage with two linked views (front + side cut-away with light path), a causal chain under it, then explanation blocks; 上课模式 hides the reading text and enlarges the stage */
+/* layout: one wide stage with two linked views (front + side cut-away with light path), a causal chain under it, then explanation blocks; 上課模式 hides the reading text and enlarges the stage */
 :root{
   --paper:#F3F6F8;--card:#FFFFFF;--ink:#17202A;--muted:#5A6672;--line:#D5DDE4;
   --muscle:#CF4F3A;--muscle-deep:#9E3423;--muscle-soft:#F6D3CB;--zonule:#B9800F;--lens:#BFDDF4;--lens-edge:#2E74B0;
   --wall:#8C9AA8;--retina:#8A55B8;--ray:#3B4652;
-  --display:"Noto Serif SC","Songti SC","STSong",serif;--body:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;--body:"Noto Sans TC","PingFang HK","PingFang TC","Microsoft JhengHei",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#0F141A;--card:#171E26;--ink:#E5EBF0;--muted:#9AA7B3;--line:#2A3540;
@@ -91,96 +91,96 @@ b{font-weight:500}
 <body>
 
 <div class="wrap">
-<h1>睫状肌收缩，悬韧带为什么反而变松？</h1>
-<p class="lede">拖动滑块，或者按“自动演示”（也可以按 <kbd>空格</kbd> 播放和暂停）。左边是正对着眼睛看，右边是把眼睛竖着切开从侧面看，两个图同步变化。课堂上投影时，按“上课模式”把图放大。</p>
-<p class="lede" style="margin-top:-12px"><a href="https://danny120128.github.io/Bio-page/3d/" style="color:var(--lens-edge)">打开立体版：可以转动的三维眼球模型 →</a></p>
+<h1>睫狀肌收縮，懸韌帶為什麼反而變鬆？</h1>
+<p class="lede">拖動滑桿，或者按「自動演示」（也可以按 <kbd>空格</kbd> 播放和暫停）。左邊是正對著眼睛看，右邊是把眼睛豎著切開從側面看，兩個圖同步變化。課堂上投影時，按「上課模式」把圖放大。</p>
+<p class="lede" style="margin-top:-12px"><a href="https://danny120128.github.io/Bio-page/3d/" style="color:var(--lens-edge)">打開立體版：可以轉動的三維眼球模型 →</a></p>
 
 <div class="stage">
   <div class="top">
-    <span class="pill" id="pill">看远：睫状肌放松</span>
+    <span class="pill" id="pill">看遠：睫狀肌放鬆</span>
   </div>
   <div class="views">
     <div class="view">
-      <p class="vt">正面看：睫状肌是一整圈</p>
-      <p class="vs">像甜甜圈一样套在晶状体外面，箭头是收缩的方向</p>
-      <svg id="front" viewBox="0 0 360 360" role="img" aria-label="正面视图：环形睫状肌、放射状悬韧带和圆形晶状体"></svg>
+      <p class="vt">正面看：睫狀肌是一整圈</p>
+      <p class="vs">像甜甜圈一樣套在晶狀體外面，箭頭是收縮的方向</p>
+      <svg id="front" viewBox="0 0 360 360" role="img" aria-label="正面視圖：環形睫狀肌、放射狀懸韌帶和圓形晶狀體"></svg>
     </div>
     <div class="view">
-      <p class="vt">侧面切开看：晶状体的厚薄</p>
-      <p class="vs">上下两团是那一圈肌肉被切开的截面</p>
-      <svg id="side" viewBox="0 0 360 352" role="img" aria-label="侧面剖视图：上下两团睫状肌截面，中间是晶状体，光线聚焦在视网膜上"></svg>
+      <p class="vt">側面切開看：晶狀體的厚薄</p>
+      <p class="vs">上下兩團是那一圈肌肉被切開的截面</p>
+      <svg id="side" viewBox="0 0 360 352" role="img" aria-label="側面剖視圖：上下兩團睫狀肌截面，中間是晶狀體，光線聚焦在視網膜上"></svg>
     </div>
   </div>
 
   <div class="legend">
-    <span><i class="sw" style="background:var(--muscle)"></i>睫状肌（环形）</span>
-    <span><i class="sw" style="background:var(--zonule)"></i>悬韧带</span>
-    <span><i class="sw" style="background:var(--lens);border:1px solid var(--lens-edge)"></i>晶状体</span>
-    <span><i class="sw" style="background:var(--wall)"></i>眼球壁的弹性（弹簧）</span>
-    <span><i class="sw" style="background:var(--retina)"></i>视网膜</span>
+    <span><i class="sw" style="background:var(--muscle)"></i>睫狀肌（環形）</span>
+    <span><i class="sw" style="background:var(--zonule)"></i>懸韌帶</span>
+    <span><i class="sw" style="background:var(--lens);border:1px solid var(--lens-edge)"></i>晶狀體</span>
+    <span><i class="sw" style="background:var(--wall)"></i>眼球壁的彈性（彈簧）</span>
+    <span><i class="sw" style="background:var(--retina)"></i>視網膜</span>
   </div>
 
   <div class="ctrl">
-    <span class="end">看远</span>
-    <input type="range" id="s" min="0" max="100" step="1" value="0" aria-label="从看远到看近">
+    <span class="end">看遠</span>
+    <input type="range" id="s" min="0" max="100" step="1" value="0" aria-label="從看遠到看近">
     <span class="end">看近</span>
     <div class="btns">
-      <button id="play" class="main" type="button">自动演示</button>
-      <button id="present" type="button">上课模式</button>
+      <button id="play" class="main" type="button">自動演示</button>
+      <button id="present" type="button">上課模式</button>
     </div>
   </div>
 
   <div class="read">
-    <div class="r"><p class="k">睫状肌</p><p class="v" id="o1">放松</p></div>
-    <div class="r"><p class="k">肌肉环的直径</p><p class="v" id="o2">100%</p></div>
-    <div class="r"><p class="k">悬韧带</p><p class="v" id="o3">绷紧</p></div>
-    <div class="r"><p class="k">晶状体</p><p class="v" id="o4">被拉扁</p></div>
+    <div class="r"><p class="k">睫狀肌</p><p class="v" id="o1">放鬆</p></div>
+    <div class="r"><p class="k">肌肉環的直徑</p><p class="v" id="o2">100%</p></div>
+    <div class="r"><p class="k">懸韌帶</p><p class="v" id="o3">繃緊</p></div>
+    <div class="r"><p class="k">晶狀體</p><p class="v" id="o4">被拉扁</p></div>
   </div>
 
   <ol class="chain" id="chain">
-    <li data-a="睫状肌放松，没有出力" data-b="睫状肌收缩，整圈往内收"></li>
-    <li data-a="眼球壁的弹性把肌肉环往外撑大" data-b="肌肉环变小，离晶状体更近"></li>
-    <li data-a="环和晶状体距离远，悬韧带被绷直" data-b="两端距离变短，悬韧带松了"></li>
-    <li data-a="晶状体被四周拉扁，适合看远" data-b="晶状体靠自身弹性鼓起来，适合看近"></li>
+    <li data-a="睫狀肌放鬆，沒有出力" data-b="睫狀肌收縮，整圈往內收"></li>
+    <li data-a="眼球壁的彈性把肌肉環往外撐大" data-b="肌肉環變小，離晶狀體更近"></li>
+    <li data-a="環和晶狀體距離遠，懸韌帶被繃直" data-b="兩端距離變短，懸韌帶鬆了"></li>
+    <li data-a="晶狀體被四周拉扁，適合看遠" data-b="晶狀體靠自身彈性鼓起來，適合看近"></li>
   </ol>
 </div>
 
 <section class="two">
   <div>
-    <h2>为什么肌肉放松时，悬韧带反而是紧的？</h2>
-    <p>关键在于：把悬韧带拉紧的不是睫状肌，而是<b>眼球壁</b>。眼球壁（主要是脉络膜）本身有弹性，平时一直把睫状肌这个环往外撑开，就是图里那些灰色弹簧。</p>
-    <p>睫状肌放松时没有出力，环就被弹簧撑得大大的。悬韧带一头挂在环的内侧，一头挂在晶状体边缘，环一大，悬韧带就被绷直，顺便把晶状体四周往外扯，晶状体就变扁了。</p>
-    <p>所以“放松 = 拉紧”其实是默认状态：什么都不做，眼睛就是对着远处调好的。</p>
+    <h2>為什麼肌肉放鬆時，懸韌帶反而是緊的？</h2>
+    <p>關鍵在於：把懸韌帶拉緊的不是睫狀肌，而是<b>眼球壁</b>。眼球壁（主要是脈絡膜）本身有彈性，平時一直把睫狀肌這個環往外撐開，就是圖裏那些灰色彈簧。</p>
+    <p>睫狀肌放鬆時沒有出力，環就被彈簧撐得大大的。懸韌帶一頭掛在環的內側，一頭掛在晶狀體邊緣，環一大，懸韌帶就被繃直，順便把晶狀體四周往外扯，晶狀體就變扁了。</p>
+    <p>所以「放鬆 = 拉緊」其實是預設狀態：什麼都不做，眼睛就是對著遠處調好的。</p>
   </div>
   <div>
-    <h2>为什么肌肉收缩时，悬韧带会变松？</h2>
-    <p>睫状肌是<b>绕着晶状体排成一圈</b>的（正面图里那一整圈红色）。环形的肌肉一收缩，整个圈就变小，就像把束口袋的绳子一拉，袋口就缩小。</p>
-    <p>环变小，意味着挂悬韧带的那一点往晶状体靠近了。悬韧带本身长度不变，两端却靠近了，所以它只能松下来、弯弯曲曲。外面的弹簧这时被拉得更长，因为肌肉在跟眼球壁的弹性对抗。</p>
-    <p>晶状体没有了四周的拉力，就靠自己的弹性鼓起来，变厚变凸，折光能力变强。近处物体发出的光是散开的，需要更强的折射才能聚到视网膜上，所以这时近处就看清了。</p>
+    <h2>為什麼肌肉收縮時，懸韌帶會變鬆？</h2>
+    <p>睫狀肌是<b>繞著晶狀體排成一圈</b>的（正面圖裏那一整圈紅色）。環形的肌肉一收縮，整個圈就變小，就像把束口袋的繩子一拉，袋口就縮小。</p>
+    <p>環變小，意味著掛懸韌帶的那一點往晶狀體靠近了。懸韌帶本身長度不變，兩端卻靠近了，所以它只能鬆下來、彎彎曲曲。外面的彈簧這時被拉得更長，因為肌肉在跟眼球壁的彈性對抗。</p>
+    <p>晶狀體沒有了四周的拉力，就靠自己的彈性鼓起來，變厚變凸，折光能力變強。近處物體發出的光是散開的，需要更強的折射才能聚到視網膜上，所以這時近處就看清了。</p>
   </div>
 </section>
 
 <section class="two">
   <div>
-    <h2>最常见的误会</h2>
-    <p class="wrong">很多人以为睫状肌是一条直的肌肉，一头拉着悬韧带。这样想的话，肌肉一收缩当然会把悬韧带拉得更紧，结果就完全反了。</p>
-    <p class="note">记住它是一个“圈”。圈收缩 = 圈变小 = 往里收，不是往外拉。</p>
+    <h2>最常見的誤會</h2>
+    <p class="wrong">很多人以為睫狀肌是一條直的肌肉，一頭拉著懸韌帶。這樣想的話，肌肉一收縮當然會把懸韌帶拉得更緊，結果就完全反了。</p>
+    <p class="note">記住它是一個「圈」。圈收縮 = 圈變小 = 往裏收，不是往外拉。</p>
   </div>
   <div class="try">
-    <h2>用一根橡皮筋试一下</h2>
+    <h2>用一根橡皮筋試一下</h2>
     <ol>
-      <li>两只手各捏住橡皮筋一端，拉开，橡皮筋绷直。两只手 = 睫状肌环的两边，橡皮筋 = 悬韧带。</li>
-      <li>两只手同时往中间靠（等于肌肉环收缩变小），手没有松开，橡皮筋却马上垂下来了。</li>
-      <li>再让人从外面拉你的手臂往两边（等于眼球壁的弹性），你一放松，橡皮筋又被拉直。</li>
+      <li>兩隻手各捏住橡皮筋一端，拉開，橡皮筋繃直。兩隻手 = 睫狀肌環的兩邊，橡皮筋 = 懸韌帶。</li>
+      <li>兩隻手同時往中間靠（等於肌肉環收縮變小），手沒有鬆開，橡皮筋卻馬上垂下來了。</li>
+      <li>再讓人從外面拉你的手臂往兩邊（等於眼球壁的彈性），你一放鬆，橡皮筋又被拉直。</li>
     </ol>
   </div>
 </section>
 
 <section>
-  <h2>一句话记住</h2>
+  <h2>一句話記住</h2>
   <div class="sums">
-    <div class="sum near"><b>看近</b><span>睫状肌收缩</span><i>→</i><span>悬韧带放松</span><i>→</i><span>晶状体变凸</span><i>→</i><span>折光能力变强</span></div>
-    <div class="sum far"><b>看远</b><span>睫状肌舒张</span><i>→</i><span>悬韧带拉紧</span><i>→</i><span>晶状体变扁</span><i>→</i><span>折光能力变弱</span></div>
+    <div class="sum near"><b>看近</b><span>睫狀肌收縮</span><i>→</i><span>懸韌帶放鬆</span><i>→</i><span>晶狀體變凸</span><i>→</i><span>折光能力變強</span></div>
+    <div class="sum far"><b>看遠</b><span>睫狀肌舒張</span><i>→</i><span>懸韌帶拉緊</span><i>→</i><span>晶狀體變扁</span><i>→</i><span>折光能力變弱</span></div>
   </div>
 </section>
 </div>
@@ -223,7 +223,7 @@ function drawFront(t){
   const rm=(g.Ro+g.Ri)/2,op=Math.min(1,t*1.6),card=css('--card');
   for(let i=0;i<8;i++){const a=i*Math.PI/4,ca=Math.cos(a),sa=Math.sin(a);
     arrow(c+(rm+11)*ca,c+(rm+11)*sa,c+(rm-11)*ca,c+(rm-11)*sa,card,F,op);}
-  const tx=el('text',{x:c,y:c+5,'text-anchor':'middle','font-size':14,'font-weight':500,fill:css('--lens-edge'),'font-family':'inherit'},F);tx.textContent='晶状体';
+  const tx=el('text',{x:c,y:c+5,'text-anchor':'middle','font-size':14,'font-weight':500,fill:css('--lens-edge'),'font-family':'inherit'},F);tx.textContent='晶狀體';
 }
 function drawSide(t){
   D.innerHTML='';const cx=180,cy=160,k=0.85,g=geo(t),mus=css('--muscle'),zon=css('--zonule'),wall=css('--wall'),muted=css('--muted'),ray=css('--ray'),ret=css('--retina');
@@ -250,29 +250,29 @@ function drawSide(t){
   el('ellipse',{cx,cy,rx:lx,ry:ly,fill:css('--lens'),stroke:css('--lens-edge'),'stroke-width':1.5},D);
   const T=(x,y,s,c,w)=>{const e=el('text',{x,y,'font-size':13,fill:c||muted,'font-family':'inherit','font-weight':w||400},D);e.textContent=s;return e;};
   el('line',{x1:108,y1:cy+60,x2:(cx-lx*0.7).toFixed(1),y2:(cy+ly*0.71).toFixed(1),stroke:muted,'stroke-width':0.8,'stroke-dasharray':'3 3'},D);
-  T(64,cy+66,'晶状体',css('--lens-edge'),500);
-  T(cx+brx+30,cy-rc+5,'睫状肌',mus,500);
-  T(cx+18,cy-(g.Ri*k+ly)/2+5,'悬韧带',zon,500);
-  T(282,cy+66,'视网膜',ret,500);
-  const cap=T(180,342,t<0.5?'远处来的光平行射入，聚在视网膜上':'近处物体的光散开射入，仍然聚在视网膜上');cap.setAttribute('text-anchor','middle');
+  T(64,cy+66,'晶狀體',css('--lens-edge'),500);
+  T(cx+brx+30,cy-rc+5,'睫狀肌',mus,500);
+  T(cx+18,cy-(g.Ri*k+ly)/2+5,'懸韌帶',zon,500);
+  T(282,cy+66,'視網膜',ret,500);
+  const cap=T(180,342,t<0.5?'遠處來的光平行射入，聚在視網膜上':'近處物體的光散開射入，仍然聚在視網膜上');cap.setAttribute('text-anchor','middle');
 }
 const pill=document.getElementById('pill');
 function update(dir,tv){
   const t=tv??S.value/100,g=geo(t);
   drawFront(t);drawSide(t);
-  document.getElementById('o1').textContent=t<0.1?'放松':t<0.6?'开始收缩':'用力收缩';
+  document.getElementById('o1').textContent=t<0.1?'放鬆':t<0.6?'開始收縮':'用力收縮';
   document.getElementById('o2').textContent=Math.round((g.Ro+g.Ri)/(160+122)*100)+'%';
-  document.getElementById('o3').textContent=t<0.1?'绷紧':t<0.6?'开始变松':'松弛';
-  document.getElementById('o4').textContent=t<0.1?'被拉扁':t<0.6?'开始鼓起':'变厚变凸';
+  document.getElementById('o3').textContent=t<0.1?'繃緊':t<0.6?'開始變鬆':'鬆弛';
+  document.getElementById('o4').textContent=t<0.1?'被拉扁':t<0.6?'開始鼓起':'變厚變凸';
   const near=dir?dir==='near':t>=0.5,x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
   document.querySelectorAll('#chain li').forEach((li,i)=>{li.textContent=near?li.dataset.b:li.dataset.a;li.classList.toggle('on',near&&x>=thr[i]);li.classList.toggle('on-far',!near&&x>=thr[i]);});
   const pn=t>=0.5;pill.classList.toggle('near',pn);
-  pill.textContent=pn?'看近：睫状肌收缩':'看远：睫状肌放松';
+  pill.textContent=pn?'看近：睫狀肌收縮':'看遠：睫狀肌放鬆';
 }
 S.addEventListener('input',()=>{stop();update();});
 let raf=null,t0=0;const btn=document.getElementById('play');
-function stop(){if(raf){cancelAnimationFrame(raf);raf=null;btn.textContent='自动演示';}}
-function toggle(){if(raf){stop();}else{t0=0;btn.textContent='暂停';raf=requestAnimationFrame(loop);}}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=null;btn.textContent='自動演示';}}
+function toggle(){if(raf){stop();}else{t0=0;btn.textContent='暫停';raf=requestAnimationFrame(loop);}}
 const PH=[3500,4500,5500,4500],TOT=18000;
 function loop(ts){if(!t0)t0=ts;let m=(ts-t0)%TOT,v,dir;
   if(m<PH[0]){v=0;dir='far';}
@@ -282,7 +282,7 @@ function loop(ts){if(!t0)t0=ts;let m=(ts-t0)%TOT,v,dir;
   const e=v<0.5?2*v*v:1-Math.pow(-2*v+2,2)/2;S.value=Math.round(e*100);update(dir,e);raf=requestAnimationFrame(loop);}
 btn.addEventListener('click',toggle);
 const pb=document.getElementById('present');
-pb.addEventListener('click',()=>{const on=document.body.classList.toggle('present');pb.textContent=on?'退出上课模式':'上课模式';pb.blur();window.scrollTo(0,0);});
+pb.addEventListener('click',()=>{const on=document.body.classList.toggle('present');pb.textContent=on?'退出上課模式':'上課模式';pb.blur();window.scrollTo(0,0);});
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['BUTTON','INPUT'].includes(e.target.tagName)){e.preventDefault();toggle();}});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>update());
 new MutationObserver(()=>update()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
