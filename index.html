@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>睫状肌怎样调焦</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600&display=swap">
+<style>
+/* layout: one wide stage with two linked views (front + side cut-away with light path), a causal chain under it, then explanation blocks; 上课模式 hides the reading text and enlarges the stage */
+:root{
+  --paper:#F3F6F8;--card:#FFFFFF;--ink:#17202A;--muted:#5A6672;--line:#D5DDE4;
+  --muscle:#CF4F3A;--muscle-deep:#9E3423;--muscle-soft:#F6D3CB;--zonule:#B9800F;--lens:#BFDDF4;--lens-edge:#2E74B0;
+  --wall:#8C9AA8;--retina:#8A55B8;--ray:#3B4652;
+  --display:"Noto Serif SC","Songti SC","STSong",serif;--body:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0F141A;--card:#171E26;--ink:#E5EBF0;--muted:#9AA7B3;--line:#2A3540;
+  --muscle:#EC735D;--muscle-deep:#F4A493;--muscle-soft:#4A2620;--zonule:#E2AB3E;--lens:#24435E;--lens-edge:#86BCEA;
+  --wall:#6D7C8B;--retina:#B993DB;--ray:#C9D3DC;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F141A;--card:#171E26;--ink:#E5EBF0;--muted:#9AA7B3;--line:#2A3540;
+  --muscle:#EC735D;--muscle-deep:#F4A493;--muscle-soft:#4A2620;--zonule:#E2AB3E;--lens:#24435E;--lens-edge:#86BCEA;
+  --wall:#6D7C8B;--retina:#B993DB;--ray:#C9D3DC;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;margin:0}
+.wrap{max-width:1000px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--display);font-size:clamp(26px,5vw,36px);line-height:1.25;margin:0 0 6px;text-wrap:balance}
+h2{font-family:var(--display);font-size:22px;margin:0 0 10px;text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 22px;max-width:64ch}
+kbd{font-family:inherit;font-size:13px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 6px;background:var(--card)}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;font-size:15px;font-weight:500;background:var(--lens);border:1px solid var(--lens-edge);transition:background .45s,border-color .45s}
+.pill::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--lens-edge);transition:background .45s}
+.pill.near{background:var(--muscle-soft);border-color:var(--muscle)}
+.pill.near::before{background:var(--muscle)}
+.views{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.view{min-width:0}
+.vt{font-size:15px;font-weight:500;margin:0 0 2px}
+.vs{font-size:13px;color:var(--muted);margin:0 0 6px}
+svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin:14px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.ctrl{display:flex;align-items:center;gap:12px;margin:16px 0 6px;flex-wrap:wrap}
+.ctrl input{flex:1;min-width:160px;accent-color:var(--muscle)}
+.ctrl .end{font-size:14px;color:var(--muted)}
+.btns{display:flex;gap:8px}
+button{font:inherit;font-size:14px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 14px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button.main{background:var(--ink);color:var(--card);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--lens-edge);outline-offset:2px}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.r{border-top:1px solid var(--line);padding-top:8px}
+.r p{margin:0}.r .k{font-size:12px;color:var(--muted);letter-spacing:.04em}.r .v{font-size:17px;font-weight:500;font-variant-numeric:tabular-nums}
+.chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:22px 0 0;padding:0;list-style:none;counter-reset:c}
+.chain li{counter-increment:c;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;transition:background .45s,border-color .45s}
+.chain li::before{content:counter(c);display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;font-size:12px;margin-right:6px;background:var(--line);color:var(--ink);transition:background .45s}
+.chain li.on{border-color:var(--muscle);background:var(--muscle-soft)}
+.chain li.on::before{background:var(--muscle);color:var(--card)}
+.chain li.on-far{border-color:var(--lens-edge);background:var(--lens)}
+.chain li.on-far::before{background:var(--lens-edge);color:var(--card)}
+section{margin-top:40px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.two>div{min-width:0}
+p{margin:0 0 12px;max-width:62ch}
+.note{border-left:3px solid var(--zonule);padding:4px 0 4px 14px;border-radius:0}
+.wrong{color:var(--muted)}
+b{font-weight:500}
+.try{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.try ol{margin:6px 0 0;padding-left:20px}.try li{margin-bottom:6px}
+.sum{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:16px}
+.sum span{padding:4px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card)}
+.sum i{font-style:normal;color:var(--muted)}
+.sum.near span{border-color:var(--muscle)}
+.sum.far span{border-color:var(--lens-edge)}
+.sum b{min-width:3.2em;color:var(--muted);font-size:14px}
+.sums{display:grid;gap:10px;margin-top:6px}
+.present .wrap{max-width:1500px;padding-block:16px 24px}
+.present .lede,.present section{display:none}
+.present h1{font-size:clamp(26px,3vw,40px)}
+.present .views{gap:36px}
+.present .view svg{max-height:56vh}
+.present .vt{font-size:18px}.present .vs{font-size:15px}
+.present .pill{font-size:19px;padding:7px 18px}
+.present .chain li{font-size:18px}
+.present .r .v{font-size:20px}
+@media (prefers-reduced-motion:reduce){.chain li,.pill,.pill::before{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<h1>睫状肌收缩，悬韧带为什么反而变松？</h1>
+<p class="lede">拖动滑块，或者按“自动演示”（也可以按 <kbd>空格</kbd> 播放和暂停）。左边是正对着眼睛看，右边是把眼睛竖着切开从侧面看，两个图同步变化。课堂上投影时，按“上课模式”把图放大。</p>
+
+<div class="stage">
+  <div class="top">
+    <span class="pill" id="pill">看远：睫状肌放松</span>
+  </div>
+  <div class="views">
+    <div class="view">
+      <p class="vt">正面看：睫状肌是一整圈</p>
+      <p class="vs">像甜甜圈一样套在晶状体外面，箭头是收缩的方向</p>
+      <svg id="front" viewBox="0 0 360 360" role="img" aria-label="正面视图：环形睫状肌、放射状悬韧带和圆形晶状体"></svg>
+    </div>
+    <div class="view">
+      <p class="vt">侧面切开看：晶状体的厚薄</p>
+      <p class="vs">上下两团是那一圈肌肉被切开的截面</p>
+      <svg id="side" viewBox="0 0 360 352" role="img" aria-label="侧面剖视图：上下两团睫状肌截面，中间是晶状体，光线聚焦在视网膜上"></svg>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw" style="background:var(--muscle)"></i>睫状肌（环形）</span>
+    <span><i class="sw" style="background:var(--zonule)"></i>悬韧带</span>
+    <span><i class="sw" style="background:var(--lens);border:1px solid var(--lens-edge)"></i>晶状体</span>
+    <span><i class="sw" style="background:var(--wall)"></i>眼球壁的弹性（弹簧）</span>
+    <span><i class="sw" style="background:var(--retina)"></i>视网膜</span>
+  </div>
+
+  <div class="ctrl">
+    <span class="end">看远</span>
+    <input type="range" id="s" min="0" max="100" step="1" value="0" aria-label="从看远到看近">
+    <span class="end">看近</span>
+    <div class="btns">
+      <button id="play" class="main" type="button">自动演示</button>
+      <button id="present" type="button">上课模式</button>
+    </div>
+  </div>
+
+  <div class="read">
+    <div class="r"><p class="k">睫状肌</p><p class="v" id="o1">放松</p></div>
+    <div class="r"><p class="k">肌肉环的直径</p><p class="v" id="o2">100%</p></div>
+    <div class="r"><p class="k">悬韧带</p><p class="v" id="o3">绷紧</p></div>
+    <div class="r"><p class="k">晶状体</p><p class="v" id="o4">被拉扁</p></div>
+  </div>
+
+  <ol class="chain" id="chain">
+    <li data-a="睫状肌放松，没有出力" data-b="睫状肌收缩，整圈往内收"></li>
+    <li data-a="眼球壁的弹性把肌肉环往外撑大" data-b="肌肉环变小，离晶状体更近"></li>
+    <li data-a="环和晶状体距离远，悬韧带被绷直" data-b="两端距离变短，悬韧带松了"></li>
+    <li data-a="晶状体被四周拉扁，适合看远" data-b="晶状体靠自身弹性鼓起来，适合看近"></li>
+  </ol>
+</div>
+
+<section class="two">
+  <div>
+    <h2>为什么肌肉放松时，悬韧带反而是紧的？</h2>
+    <p>关键在于：把悬韧带拉紧的不是睫状肌，而是<b>眼球壁</b>。眼球壁（主要是脉络膜）本身有弹性，平时一直把睫状肌这个环往外撑开，就是图里那些灰色弹簧。</p>
+    <p>睫状肌放松时没有出力，环就被弹簧撑得大大的。悬韧带一头挂在环的内侧，一头挂在晶状体边缘，环一大，悬韧带就被绷直，顺便把晶状体四周往外扯，晶状体就变扁了。</p>
+    <p>所以“放松 = 拉紧”其实是默认状态：什么都不做，眼睛就是对着远处调好的。</p>
+  </div>
+  <div>
+    <h2>为什么肌肉收缩时，悬韧带会变松？</h2>
+    <p>睫状肌是<b>绕着晶状体排成一圈</b>的（正面图里那一整圈红色）。环形的肌肉一收缩，整个圈就变小，就像把束口袋的绳子一拉，袋口就缩小。</p>
+    <p>环变小，意味着挂悬韧带的那一点往晶状体靠近了。悬韧带本身长度不变，两端却靠近了，所以它只能松下来、弯弯曲曲。外面的弹簧这时被拉得更长，因为肌肉在跟眼球壁的弹性对抗。</p>
+    <p>晶状体没有了四周的拉力，就靠自己的弹性鼓起来，变厚变凸，折光能力变强。近处物体发出的光是散开的，需要更强的折射才能聚到视网膜上，所以这时近处就看清了。</p>
+  </div>
+</section>
+
+<section class="two">
+  <div>
+    <h2>最常见的误会</h2>
+    <p class="wrong">很多人以为睫状肌是一条直的肌肉，一头拉着悬韧带。这样想的话，肌肉一收缩当然会把悬韧带拉得更紧，结果就完全反了。</p>
+    <p class="note">记住它是一个“圈”。圈收缩 = 圈变小 = 往里收，不是往外拉。</p>
+  </div>
+  <div class="try">
+    <h2>用一根橡皮筋试一下</h2>
+    <ol>
+      <li>两只手各捏住橡皮筋一端，拉开，橡皮筋绷直。两只手 = 睫状肌环的两边，橡皮筋 = 悬韧带。</li>
+      <li>两只手同时往中间靠（等于肌肉环收缩变小），手没有松开，橡皮筋却马上垂下来了。</li>
+      <li>再让人从外面拉你的手臂往两边（等于眼球壁的弹性），你一放松，橡皮筋又被拉直。</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <h2>一句话记住</h2>
+  <div class="sums">
+    <div class="sum near"><b>看近</b><span>睫状肌收缩</span><i>→</i><span>悬韧带放松</span><i>→</i><span>晶状体变凸</span><i>→</i><span>折光能力变强</span></div>
+    <div class="sum far"><b>看远</b><span>睫状肌舒张</span><i>→</i><span>悬韧带拉紧</span><i>→</i><span>晶状体变扁</span><i>→</i><span>折光能力变弱</span></div>
+  </div>
+</section>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const S=document.getElementById('s'),F=document.getElementById('front'),D=document.getElementById('side');
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;}
+function wave(x1,y1,x2,y2,L){
+  const dx=x2-x1,dy=y2-y1,d=Math.hypot(dx,dy),s=Math.max(0,L-d);
+  const h=Math.sqrt(3*(d/2)*(s/2)/8),nx=-dy/d,ny=dx/d;let p='';
+  for(let i=0;i<=20;i++){const u=i/20,o=h*Math.sin(2*Math.PI*u);
+    p+=(i?'L':'M')+(x1+dx*u+nx*o).toFixed(1)+' '+(y1+dy*u+ny*o).toFixed(1)+' ';}
+  return p;
+}
+function spring(x1,y1,x2,y2){
+  const dx=x2-x1,dy=y2-y1,d=Math.hypot(dx,dy),nx=-dy/d,ny=dx/d,n=7;let p=`M${x1.toFixed(1)} ${y1.toFixed(1)} `;
+  for(let i=1;i<n;i++){const u=i/n,o=(i%2?1:-1)*4;p+=`L${(x1+dx*u+nx*o).toFixed(1)} ${(y1+dy*u+ny*o).toFixed(1)} `;}
+  return p+`L${x2.toFixed(1)} ${y2.toFixed(1)}`;
+}
+function arrow(x1,y1,x2,y2,col,parent,op){
+  const g=el('g',{opacity:op},parent);
+  el('line',{x1,y1,x2,y2,stroke:col,'stroke-width':2.4,'stroke-linecap':'round'},g);
+  const a=Math.atan2(y2-y1,x2-x1),l=7;
+  el('path',{d:`M${x2-l*Math.cos(a-0.5)} ${y2-l*Math.sin(a-0.5)} L${x2} ${y2} L${x2-l*Math.cos(a+0.5)} ${y2-l*Math.sin(a+0.5)}`,fill:'none',stroke:col,'stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+}
+function geo(t){return{Ro:160-30*t,Ri:122-46*t,Rl:74-14*t,L0:48};}
+function ring(c,Ro,Ri){return `M${c+Ro} ${c}A${Ro} ${Ro} 0 1 0 ${c-Ro} ${c}A${Ro} ${Ro} 0 1 0 ${c+Ro} ${c}Z M${c+Ri} ${c}A${Ri} ${Ri} 0 1 1 ${c-Ri} ${c}A${Ri} ${Ri} 0 1 1 ${c+Ri} ${c}Z`;}
+
+function drawFront(t){
+  F.innerHTML='';const c=180,g=geo(t),mus=css('--muscle'),zon=css('--zonule'),wall=css('--wall');
+  el('circle',{cx:c,cy:c,r:172,fill:'none',stroke:wall,'stroke-width':3},F);
+  for(let i=0;i<8;i++){const a=i*Math.PI/4+Math.PI/8,ca=Math.cos(a),sa=Math.sin(a);
+    el('path',{d:spring(c+170*ca,c+170*sa,c+g.Ro*ca,c+g.Ro*sa),fill:'none',stroke:wall,'stroke-width':1.4,'stroke-linejoin':'round'},F);}
+  el('path',{d:ring(c,g.Ro,g.Ri),'fill-rule':'evenodd',fill:mus,stroke:css('--muscle-deep'),'stroke-width':1.2},F);
+  for(let i=0;i<24;i++){const a=i*Math.PI/12,ca=Math.cos(a),sa=Math.sin(a);
+    el('path',{d:wave(c+g.Rl*ca,c+g.Rl*sa,c+g.Ri*ca,c+g.Ri*sa,g.L0),fill:'none',stroke:zon,'stroke-width':1.6,'stroke-linecap':'round'},F);}
+  el('circle',{cx:c,cy:c,r:g.Rl,fill:css('--lens'),stroke:css('--lens-edge'),'stroke-width':1.5},F);
+  const rm=(g.Ro+g.Ri)/2,op=Math.min(1,t*1.6),card=css('--card');
+  for(let i=0;i<8;i++){const a=i*Math.PI/4,ca=Math.cos(a),sa=Math.sin(a);
+    arrow(c+(rm+11)*ca,c+(rm+11)*sa,c+(rm-11)*ca,c+(rm-11)*sa,card,F,op);}
+  const tx=el('text',{x:c,y:c+5,'text-anchor':'middle','font-size':14,'font-weight':500,fill:css('--lens-edge'),'font-family':'inherit'},F);tx.textContent='晶状体';
+}
+function drawSide(t){
+  D.innerHTML='';const cx=180,cy=160,k=0.85,g=geo(t),mus=css('--muscle'),zon=css('--zonule'),wall=css('--wall'),muted=css('--muted'),ray=css('--ray'),ret=css('--retina');
+  const ER=152,ecx=190,rx=ecx+ER;
+  el('circle',{cx:ecx,cy,r:ER,fill:'none',stroke:wall,'stroke-width':3},D);
+  const a0=0.6;el('path',{d:`M${ecx+ER*Math.cos(-a0)} ${cy+ER*Math.sin(-a0)} A${ER} ${ER} 0 0 1 ${ecx+ER*Math.cos(a0)} ${cy+ER*Math.sin(a0)}`,fill:'none',stroke:ret,'stroke-width':5,'stroke-linecap':'round'},D);
+  const sx=8;
+  [-30,-14,14,30].forEach(h=>{
+    el('path',{d:`M${sx} ${(cy+h*(1-t)).toFixed(1)} L${cx} ${cy+h} L${rx-2} ${cy}`,fill:'none',stroke:ray,'stroke-width':1.3,opacity:0.6,'stroke-linejoin':'round'},D);
+  });
+  const ob=el('g',{opacity:t.toFixed(2)},D);
+  el('line',{x1:sx,y1:cy+14,x2:sx,y2:cy-10,stroke:ray,'stroke-width':2.2,'stroke-linecap':'round'},ob);
+  el('path',{d:`M${sx-5} ${cy-4} L${sx} ${cy-11} L${sx+5} ${cy-4}`,fill:'none',stroke:ray,'stroke-width':2.2,'stroke-linecap':'round','stroke-linejoin':'round'},ob);
+  el('circle',{cx:rx-2,cy,r:4.5,fill:ret},D);
+  const rc=(g.Ro+g.Ri)/2*k,bry=(g.Ro-g.Ri)/2*k,brx=16+6*t,ly=g.Rl*k,lx=12+22*t;
+  [-1,1].forEach(sd=>{
+    const by=cy+sd*rc,outer=by+sd*bry,wy=cy+sd*Math.sqrt(ER*ER-100);
+    [-12,12].forEach(ox=>el('path',{d:spring(cx+ox,wy,cx+ox,outer),fill:'none',stroke:wall,'stroke-width':1.4,'stroke-linejoin':'round'},D));
+    el('ellipse',{cx,cy:by,rx:brx,ry:bry,fill:mus,stroke:css('--muscle-deep'),'stroke-width':1.2},D);
+    [-1,0,1].forEach(i=>{const x1=cx+i*10,y1=cy+sd*(g.Ri*k),x2=cx+i*Math.min(6,lx*0.4),y2=cy+sd*ly;
+      el('path',{d:wave(x1,y1,x2,y2,g.L0*k),fill:'none',stroke:zon,'stroke-width':1.6,'stroke-linecap':'round'},D);});
+    arrow(cx-brx-14,by,cx-brx-14,by-sd*20,css('--ink'),D,Math.min(1,t*1.6));
+  });
+  el('ellipse',{cx,cy,rx:lx,ry:ly,fill:css('--lens'),stroke:css('--lens-edge'),'stroke-width':1.5},D);
+  const T=(x,y,s,c,w)=>{const e=el('text',{x,y,'font-size':13,fill:c||muted,'font-family':'inherit','font-weight':w||400},D);e.textContent=s;return e;};
+  el('line',{x1:108,y1:cy+60,x2:(cx-lx*0.7).toFixed(1),y2:(cy+ly*0.71).toFixed(1),stroke:muted,'stroke-width':0.8,'stroke-dasharray':'3 3'},D);
+  T(64,cy+66,'晶状体',css('--lens-edge'),500);
+  T(cx+brx+30,cy-rc+5,'睫状肌',mus,500);
+  T(cx+18,cy-(g.Ri*k+ly)/2+5,'悬韧带',zon,500);
+  T(282,cy+66,'视网膜',ret,500);
+  const cap=T(180,342,t<0.5?'远处来的光平行射入，聚在视网膜上':'近处物体的光散开射入，仍然聚在视网膜上');cap.setAttribute('text-anchor','middle');
+}
+const pill=document.getElementById('pill');
+function update(dir,tv){
+  const t=tv??S.value/100,g=geo(t);
+  drawFront(t);drawSide(t);
+  document.getElementById('o1').textContent=t<0.1?'放松':t<0.6?'开始收缩':'用力收缩';
+  document.getElementById('o2').textContent=Math.round((g.Ro+g.Ri)/(160+122)*100)+'%';
+  document.getElementById('o3').textContent=t<0.1?'绷紧':t<0.6?'开始变松':'松弛';
+  document.getElementById('o4').textContent=t<0.1?'被拉扁':t<0.6?'开始鼓起':'变厚变凸';
+  const near=dir?dir==='near':t>=0.5,x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
+  document.querySelectorAll('#chain li').forEach((li,i)=>{li.textContent=near?li.dataset.b:li.dataset.a;li.classList.toggle('on',near&&x>=thr[i]);li.classList.toggle('on-far',!near&&x>=thr[i]);});
+  const pn=t>=0.5;pill.classList.toggle('near',pn);
+  pill.textContent=pn?'看近：睫状肌收缩':'看远：睫状肌放松';
+}
+S.addEventListener('input',()=>{stop();update();});
+let raf=null,t0=0;const btn=document.getElementById('play');
+function stop(){if(raf){cancelAnimationFrame(raf);raf=null;btn.textContent='自动演示';}}
+function toggle(){if(raf){stop();}else{t0=0;btn.textContent='暂停';raf=requestAnimationFrame(loop);}}
+const PH=[3500,4500,5500,4500],TOT=18000;
+function loop(ts){if(!t0)t0=ts;let m=(ts-t0)%TOT,v,dir;
+  if(m<PH[0]){v=0;dir='far';}
+  else if((m-=PH[0])<PH[1]){v=m/PH[1];dir='near';}
+  else if((m-=PH[1])<PH[2]){v=1;dir='near';}
+  else{m-=PH[2];v=1-m/PH[3];dir='far';}
+  const e=v<0.5?2*v*v:1-Math.pow(-2*v+2,2)/2;S.value=Math.round(e*100);update(dir,e);raf=requestAnimationFrame(loop);}
+btn.addEventListener('click',toggle);
+const pb=document.getElementById('present');
+pb.addEventListener('click',()=>{const on=document.body.classList.toggle('present');pb.textContent=on?'退出上课模式':'上课模式';pb.blur();window.scrollTo(0,0);});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['BUTTON','INPUT'].includes(e.target.tagName)){e.preventDefault();toggle();}});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>update());
+new MutationObserver(()=>update()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+update();
+</script>
+</body>
+</html>
