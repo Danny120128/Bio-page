@@ -533,6 +533,9 @@ function resample(pts,M){const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+
   for(let k=0;k<M;k++){const s=tot*k/(M-1);let i=1;while(i<pts.length-1&&L[i]<s)i++;const u=(s-L[i-1])/((L[i]-L[i-1])||1);o.push(new V3().lerpVectors(pts[i-1],pts[i],clamp(u,0,1)));}return o;}
 
 let LAST=null,lastRad=0.05;
+/* direction of the muscle's movement: +1 contracting, -1 relaxing (elastic recoil); arrows fade about a second after it stops */
+const MV={prev:null,dir:0,last:-1e9,shown:false};
+const motionAmp=()=>{if(!MV.dir)return 0;const s=performance.now()-MV.last;return s<250?1:Math.max(0,1-(s-250)/900);};
 const rayRad=()=>clamp(cam.r*0.00085,0.014,0.05);
 function updateGeo(){
   const g=geom(st.t);G=g;const [f0,fl]=CUT();
@@ -563,17 +566,17 @@ function updateGeo(){
   focusDot.scale.setScalar(rr/0.05);
   if(fv){focusDot.position.set(0,F.yI,0);MAT.focus.color.setHex(Math.abs(F.dF)<0.03?0x5FD08A:0xFF9B54);}
   /* arrows: contraction direction of the ciliary ring, and the forward pull on the choroid */
-  const op=clamp(st.t*1.6,0,1)*0.95;MAT.arrow.opacity=op;MAT.arrowC.opacity=op;
-  const dA=new THREE.Vector2(G1.A[0]-G0.A[0],G1.A[1]-G0.A[1]).normalize();
+  const q=MV.dir<0?-1:1;
+  const dA=new THREE.Vector2(G1.A[0]-G0.A[0],G1.A[1]-G0.A[1]).normalize().multiplyScalar(q);
   const Y=new V3(0,1,0);let used=0;
-  const place=(arr,pos,dir)=>{arr.position.copy(pos);arr.quaternion.setFromUnitVectors(Y,dir.clone().normalize());arr.visible=op>0.01;};
+  const place=(arr,pos,dir)=>{arr.position.copy(pos);arr.quaternion.setFromUnitVectors(Y,dir.clone().normalize());arr.visible=true;};
   const ca=capAngles();
   if(ca.length){ca.forEach(([f,s],ii)=>{const nrm=new V3(s*Math.cos(f),0,-s*Math.sin(f));
       const base=mix(g.A,[onR(11.5,g.A[1])[0],g.A[1]],.62);
       const dir=new V3(dA.x*Math.sin(f),dA.y,dA.x*Math.cos(f));
       place(ARR[used++],P(base[0]-bump(f)*.5,base[1],f).addScaledVector(nrm,.14).addScaledVector(dir,-0.55),dir);
       const ry=g.yo-2.2,rr=onR(11.33,ry)[0];
-      const tdir=new V3(-ry*Math.sin(f),rr,-ry*Math.cos(f)).normalize();
+      const tdir=new V3(-ry*Math.sin(f),rr,-ry*Math.cos(f)).normalize().multiplyScalar(q);
       place(ARRC[ii],P(rr,ry,f).addScaledVector(nrm,.14).addScaledVector(tdir,-0.5),tdir);});
   }else{ARRC.forEach(a=>a.visible=false);}
   if(st.cut==='full'){for(let i=0;i<8&&used<ARR.length;i++){const f=i*TAU/8+UP;
@@ -739,7 +742,7 @@ const INFO={
   sclera:{n:'鞏膜',x:'眼球白色、堅韌的外殼，保護眼球、維持形狀。',
     now:()=>Math.abs(OPT.sax-1)>0.002?'這隻眼的眼球比正常'+(OPT.sax>1?'長 ':'短 ')+Math.abs((OPT.sax-1)*RET).toFixed(1)+' 毫米。':'眼球長度正常。'},
   choroid:{n:'脈絡膜',x:'鞏膜內側顏色很深、血管豐富的一層。它有彈性，向前連著睫狀體。睫狀肌收縮時把它往前拉；睫狀肌一放鬆，它的彈性就把睫狀體拉回原位，懸韌帶又被拉緊。',
-    now:g=>g.t>=0.5?'正被睫狀肌往前拉（看黃色小箭頭）。':'已經回彈，把睫狀體拉回後外方。'},
+    now:g=>MV.dir<0&&motionAmp()>0?'正在回彈，把睫狀體拉回後外方（黃色小箭頭向後）。':g.t>=0.02?'被睫狀肌往前拉（收縮時黃色小箭頭向前）。':'已經回彈，把睫狀體拉回後外方。'},
   retina:{n:'視網膜',x:'眼球最裏面的一層，有感光細胞。光線要準確聚在視網膜上，看到的影像才清楚。前緣叫鋸齒緣。',now:()=>LAST?focusText(LAST.F,false)+'。':''},
   vitreous:{n:'玻璃體',x:'填滿晶狀體後面空間的透明膠狀物，幫助維持眼球的形狀。'},
   ray:{n:'光線',x:'黃色線是物體射進眼睛的光。光經過眼鏡、角膜和晶狀體前後表面時會折射。遠處物體的光差不多是平行的；近處物體的光是散開的。',
@@ -764,26 +767,30 @@ function renderInfo(){const k=st.sel,I=k&&INFO[k];
 const S=$('s'),TM=$('tm'),pill=$('pill'),pill2=$('pill2');
 let geoDirty=true,tMoved=false,lastDir=null;
 function recompute(dir){
-  const t=solveT();st.t=t;geoDirty=true;tMoved=true;if(dir!==undefined)lastDir=dir;
+  const t=solveT();if(MV.prev!==null&&Math.abs(t-MV.prev)>1e-4){MV.dir=t>MV.prev?1:-1;MV.last=performance.now();}MV.prev=t;
+  st.t=t;geoDirty=true;tMoved=true;if(dir!==undefined)lastDir=dir;
   const g=geom(t),Pg=glassesP(),yO=yObj(),F=fwd(g,Pg,yO);
   const Vobj=isFinite(yO)?-1000/(yO-F.S[0].y):0,dD=Vobj-needV(g,Pg),A=needV(geom(0),null)-needV(g,null);
   LAST={g,F,dD,A,rays:traceRays(g,F,yO)};
   $('o6').textContent=fmtDist();
-  $('o1').textContent=t<0.02?'放鬆':t<0.6?'稍為收縮':'收縮';
-  $('o2').textContent=t<0.02?'拉緊':t<0.6?'稍為變鬆':'鬆弛';
-  $('o7').textContent=t<0.02?'放鬆':t<0.6?'稍為拉緊':'拉緊';
-  $('o3').textContent=t<0.02?'最扁':t<0.6?'稍為變凸':'厚、凸';
-  $('o4').textContent=t<0.02?'較大':t<0.6?'稍為縮小':'縮小';
+  stateReadouts();
   $('o5').textContent=Math.max(0,A).toFixed(1)+' D';
   const ok=Math.abs(F.dF)<0.03;$('o8').textContent=focusText(F,true);$('o8').className='v '+(ok?'ok':'bad');
   const ct=clearText(dD),clear=ct==='清楚';$('o9').textContent=ct;$('o9').className='v '+(clear?'ok':'bad');
   pill2.textContent='影像'+ct+'：焦點'+focusText(F,true);pill2.className='pill '+(clear?'ok':'bad');
-  const near=lastDir?lastDir==='near':t>=0.5,x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
+  const near=lastDir?lastDir==='near':(motionAmp()>0&&MV.dir!==0?MV.dir>0:t>=0.5),x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
   document.querySelectorAll('#chain li').forEach((li,i)=>{li.textContent=near?li.dataset.b:li.dataset.a;li.classList.toggle('on',near&&x>=thr[i]);li.classList.toggle('on-far',!near&&x>=thr[i]);});
   const pn=t>=0.02;pill.classList.toggle('near',pn);pill.textContent=(t<0.02?'睫狀肌放鬆':t<0.6?'睫狀肌稍為收縮':'睫狀肌收縮')+(st.obj<0.0005?'（看遠處）':'（看 '+fmtDist()+'）');
   if(st.sel)renderInfo();
   if(!st.auto)TM.value=Math.round(st.tm*1000);
   req();}
+
+function stateReadouts(){const t=st.t,mv=motionAmp()>0.5?MV.dir:0;
+  $('o1').textContent=mv>0?'收縮中':mv<0?'放鬆中':t<0.02?'放鬆':t<0.6?'稍為收縮':'收縮';
+  $('o2').textContent=mv>0?'變鬆中':mv<0?'被拉緊中':t<0.02?'拉緊':t<0.6?'稍為變鬆':'鬆弛';
+  $('o7').textContent=mv>0?'被拉緊中':mv<0?'變鬆中':t<0.02?'放鬆':t<0.6?'稍為拉緊':'拉緊';
+  $('o3').textContent=mv>0?'變凸中':mv<0?'變扁中':t<0.02?'最扁':t<0.6?'稍為變凸':'厚、凸';
+  $('o4').textContent=mv>0?'縮小中':mv<0?'放大中':t<0.02?'較大':t<0.6?'稍為縮小':'縮小';}
 
 /* ---------- controls ---------- */
 S.addEventListener('input',()=>{stop();st.obj=S.value/1000;lastDir=null;recompute();});
@@ -841,6 +848,8 @@ function frame(now){pending=false;
   const moving=stepTween(now);
   if(st.ray&&Math.abs(rayRad()-lastRad)/lastRad>0.12)geoDirty=true;
   if(geoDirty||cutDirty){updateGeo();geoDirty=false;drawInsets();}
+  const amp=motionAmp();MAT.arrow.opacity=MAT.arrowC.opacity=amp*0.95;grp.arrows.visible=amp>0.01;
+  if(amp>0){MV.shown=true;req();}else if(MV.shown){MV.shown=false;stateReadouts();}
   placeCam();renderer.render(scene,camera);
   const busy=moving||camMoved||playing||tMoved;if(busy)occStale=true;tMoved=false;
   updateLabels(!busy&&occStale);if(!busy)occStale=false;camMoved=false;
@@ -849,11 +858,11 @@ function frame(now){pending=false;
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();stop();});
 
 /* hooks for checking the model */
-window.__eye={proj:(x,y,z)=>{const v=eye.localToWorld(new V3(x,y,z)).project(camera),r=canvas.getBoundingClientRect();return [r.left+(v.x+1)/2*r.width,r.top+(1-v.y)/2*r.height];},st,OPT,geom,fwd,needV,solveOpt,solveT,traceRays,yRet,glassesP,yObj,surfaces,NL:()=>NL,last:()=>LAST,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,
+window.__eye={MV,proj:(x,y,z)=>{const v=eye.localToWorld(new V3(x,y,z)).project(camera),r=canvas.getBoundingClientRect();return [r.left+(v.x+1)/2*r.width,r.top+(1-v.y)/2*r.height];},st,OPT,geom,fwd,needV,solveOpt,solveT,traceRays,yRet,glassesP,yObj,surfaces,NL:()=>NL,last:()=>LAST,lensY,irisBackY,lensPt,ZDEF,PPZ,dist2,
   fib2d:t=>{const g=geom(t);return ZDEF.map(z=>{const o=z.o(g),e=lensPt(g,z.th*Math.PI/180);return fiberPath(P(o[0],o[1],UP),P(e[0],e[1],UP),z.L,1,z.ph,UP,40).pts.map(v=>[v.x,v.y]);});},
   set:(o)=>{Object.assign(st,o);if('sev' in o||'eye' in o||'cause' in o){solveOpt();computeRest();cutDirty=true;}S.value=Math.round(st.obj*1000);syncUI();applyVis();recompute();},
   view:n=>goView(n,true),select,
-  frame:()=>{if(geoDirty||cutDirty){updateGeo();geoDirty=false;drawInsets();}placeCam();renderer.render(scene,camera);updateLabels(true);}};
+  frame:()=>{if(geoDirty||cutDirty){updateGeo();geoDirty=false;drawInsets();}const amp=motionAmp();MAT.arrow.opacity=MAT.arrowC.opacity=amp*0.95;grp.arrows.visible=amp>0.01;placeCam();renderer.render(scene,camera);updateLabels(true);}};
 
 if(stageEl.clientWidth<600){st.fin=false;st.sin=false;}
 applyVis();syncUI();goView('oblique',true);recompute();resize();

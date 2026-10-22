@@ -102,7 +102,7 @@ b{font-weight:500}
   <div class="views">
     <div class="view">
       <p class="vt">正面看：睫狀肌是一整圈</p>
-      <p class="vs">像甜甜圈一樣套在晶狀體外面，箭頭是收縮的方向</p>
+      <p class="vs">像甜甜圈一樣套在晶狀體外面，箭頭是睫狀肌移動的方向</p>
       <svg id="front" viewBox="0 0 360 360" role="img" aria-label="正面視圖：環形睫狀肌、放射狀懸韌帶和圓形晶狀體"></svg>
     </div>
     <div class="view">
@@ -118,6 +118,7 @@ b{font-weight:500}
     <span><i class="sw" style="background:var(--lens);border:1px solid var(--lens-edge)"></i>晶狀體</span>
     <span><i class="sw" style="background:var(--wall)"></i>眼球壁的彈性（彈簧）</span>
     <span><i class="sw" style="background:var(--retina)"></i>視網膜</span>
+    <span>白色箭頭：睫狀肌移動的方向（向內＝收縮，向外＝被眼球壁彈回）</span>
   </div>
 
   <div class="ctrl">
@@ -211,7 +212,7 @@ function arrow(x1,y1,x2,y2,col,parent,op){
 function geo(t){return{Ro:160-30*t,Ri:122-46*t,Rl:74-14*t,L0:48};}
 function ring(c,Ro,Ri){return `M${c+Ro} ${c}A${Ro} ${Ro} 0 1 0 ${c-Ro} ${c}A${Ro} ${Ro} 0 1 0 ${c+Ro} ${c}Z M${c+Ri} ${c}A${Ri} ${Ri} 0 1 1 ${c-Ri} ${c}A${Ri} ${Ri} 0 1 1 ${c+Ri} ${c}Z`;}
 
-function drawFront(t){
+function drawFront(t,mv){
   F.innerHTML='';const c=180,g=geo(t),mus=css('--muscle'),zon=css('--zonule'),wall=css('--wall');
   el('circle',{cx:c,cy:c,r:172,fill:'none',stroke:wall,'stroke-width':3},F);
   for(let i=0;i<8;i++){const a=i*Math.PI/4+Math.PI/8,ca=Math.cos(a),sa=Math.sin(a);
@@ -220,12 +221,12 @@ function drawFront(t){
   for(let i=0;i<24;i++){const a=i*Math.PI/12,ca=Math.cos(a),sa=Math.sin(a);
     el('path',{d:wave(c+g.Rl*ca,c+g.Rl*sa,c+g.Ri*ca,c+g.Ri*sa,g.L0),fill:'none',stroke:zon,'stroke-width':1.6,'stroke-linecap':'round'},F);}
   el('circle',{cx:c,cy:c,r:g.Rl,fill:css('--lens'),stroke:css('--lens-edge'),'stroke-width':1.5},F);
-  const rm=(g.Ro+g.Ri)/2,op=Math.min(1,t*1.6),card=css('--card');
-  for(let i=0;i<8;i++){const a=i*Math.PI/4,ca=Math.cos(a),sa=Math.sin(a);
-    arrow(c+(rm+11)*ca,c+(rm+11)*sa,c+(rm-11)*ca,c+(rm-11)*sa,card,F,op);}
+  const rm=(g.Ro+g.Ri)/2,card=css('--card'),q=mv.dir>=0?1:-1;
+  if(mv.amp>0.01)for(let i=0;i<8;i++){const a=i*Math.PI/4,ca=Math.cos(a),sa=Math.sin(a);
+    arrow(c+(rm+11*q)*ca,c+(rm+11*q)*sa,c+(rm-11*q)*ca,c+(rm-11*q)*sa,card,F,mv.amp);}
   const tx=el('text',{x:c,y:c+5,'text-anchor':'middle','font-size':14,'font-weight':500,fill:css('--lens-edge'),'font-family':'inherit'},F);tx.textContent='晶狀體';
 }
-function drawSide(t){
+function drawSide(t,mv){
   D.innerHTML='';const cx=180,cy=160,k=0.85,g=geo(t),mus=css('--muscle'),zon=css('--zonule'),wall=css('--wall'),muted=css('--muted'),ray=css('--ray'),ret=css('--retina');
   const ER=152,ecx=190,rx=ecx+ER;
   el('circle',{cx:ecx,cy,r:ER,fill:'none',stroke:wall,'stroke-width':3},D);
@@ -245,7 +246,7 @@ function drawSide(t){
     el('ellipse',{cx,cy:by,rx:brx,ry:bry,fill:mus,stroke:css('--muscle-deep'),'stroke-width':1.2},D);
     [-1,0,1].forEach(i=>{const x1=cx+i*10,y1=cy+sd*(g.Ri*k),x2=cx+i*Math.min(6,lx*0.4),y2=cy+sd*ly;
       el('path',{d:wave(x1,y1,x2,y2,g.L0*k),fill:'none',stroke:zon,'stroke-width':1.6,'stroke-linecap':'round'},D);});
-    arrow(cx-brx-14,by,cx-brx-14,by-sd*20,css('--ink'),D,Math.min(1,t*1.6));
+    if(mv.amp>0.01){const q=mv.dir>=0?1:-1;arrow(cx-brx-14,by-sd*10+sd*10*q,cx-brx-14,by-sd*10-sd*10*q,css('--ink'),D,mv.amp);}
   });
   el('ellipse',{cx,cy,rx:lx,ry:ly,fill:css('--lens'),stroke:css('--lens-edge'),'stroke-width':1.5},D);
   const T=(x,y,s,c,w)=>{const e=el('text',{x,y,'font-size':13,fill:c||muted,'font-family':'inherit','font-weight':w||400},D);e.textContent=s;return e;};
@@ -257,14 +258,19 @@ function drawSide(t){
   const cap=T(180,342,t<0.5?'遠處來的光平行射入，聚在視網膜上':'近處物體的光散開射入，仍然聚在視網膜上');cap.setAttribute('text-anchor','middle');
 }
 const pill=document.getElementById('pill');
-function update(dir,tv){
-  const t=tv??S.value/100,g=geo(t);
-  drawFront(t);drawSide(t);
-  document.getElementById('o1').textContent=t<0.1?'放鬆':t<0.6?'開始收縮':'用力收縮';
+/* direction of the muscle's movement: +1 contracting (ring moves inward), -1 relaxing (wall elasticity pulls it back out); arrows fade about a second after it stops */
+const MV={prev:null,dir:0,last:-1e9,amp:0};let fadeRaf=null,lastArgs=[];
+function track(t){const now=performance.now();if(MV.prev!==null&&Math.abs(t-MV.prev)>1e-4){MV.dir=t>MV.prev?1:-1;MV.last=now;}MV.prev=t;
+  const since=now-MV.last;MV.amp=MV.dir===0?0:since<250?1:Math.max(0,1-(since-250)/900);
+  if(MV.amp>0&&!raf&&!fadeRaf)fadeRaf=requestAnimationFrame(()=>{fadeRaf=null;update(...lastArgs);});}
+function update(dir,tv){lastArgs=[dir,tv];
+  const t=tv??S.value/100,g=geo(t);track(t);const mv={dir:MV.dir,amp:MV.amp},moving=mv.amp>0.5;
+  drawFront(t,mv);drawSide(t,mv);
+  document.getElementById('o1').textContent=moving?(mv.dir>0?'收縮中':'放鬆中（被彈回）'):t<0.02?'放鬆':t>0.98?'收縮':'部分收縮';
   document.getElementById('o2').textContent=Math.round((g.Ro+g.Ri)/(160+122)*100)+'%';
-  document.getElementById('o3').textContent=t<0.1?'繃緊':t<0.6?'開始變鬆':'鬆弛';
-  document.getElementById('o4').textContent=t<0.1?'被拉扁':t<0.6?'開始鼓起':'變厚變凸';
-  const near=dir?dir==='near':t>=0.5,x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
+  document.getElementById('o3').textContent=moving?(mv.dir>0?'變鬆中':'被拉緊中'):t<0.02?'繃緊':t>0.98?'鬆弛':'稍鬆';
+  document.getElementById('o4').textContent=moving?(mv.dir>0?'鼓起中':'被拉扁中'):t<0.02?'被拉扁':t>0.98?'變厚變凸':'稍凸';
+  const near=dir?dir==='near':(MV.amp>0&&MV.dir!==0?MV.dir>0:t>=0.5),x=near?t:1-t,thr=[0.1,0.35,0.6,0.85];
   document.querySelectorAll('#chain li').forEach((li,i)=>{li.textContent=near?li.dataset.b:li.dataset.a;li.classList.toggle('on',near&&x>=thr[i]);li.classList.toggle('on-far',!near&&x>=thr[i]);});
   const pn=t>=0.5;pill.classList.toggle('near',pn);
   pill.textContent=pn?'看近：睫狀肌收縮':'看遠：睫狀肌放鬆';
